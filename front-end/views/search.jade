@@ -8,12 +8,13 @@ block content
         input(type="submit", value="Go!")
     #results
       each result in results
-        h2
-          a(href="details/" + result.name)
-            span.name= result.name
-            span.type_separator  :: 
-            span.signature= result.signature 
-        p= result.description
-          ul
-            each tag in result.tags
-              li= tag
+        .result
+          h3
+            a(href="details/" + result.name)
+              span.name= result.name
+              span.type_separator ::
+              span.signature= result.signature
+          p= result.description
+            ul
+              each tag in result.tags
+                li= tag
