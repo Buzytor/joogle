@@ -39,25 +39,6 @@ var Fn = exports.Fn = function(selfType, params, returnType) {
 	this.returnType = returnType;
 };
 
-// A synonym for (realType | null).
-var Nullable = exports.Nullable = function(realType) {
-	if(!(this instanceof Nullable)) return new Nullable(realType);
-	this.realType = realType;
-};
-
-// An union type (A | B | C | ...).
-var Union = exports.Union = function(types) {
-	if(!(this instanceof Union)) return new Union(types);
-	this.types = types;
-};
-
-// Returns a type which is a union of all of given types.
-// Given Union types are merged together, producing a flat structure.
-var union = exports.union = function(types) {
-	// TODO flatten the structure
-	return Union(types);
-};
-
 // A generic type, identified by name.
 var Generic = exports.Generic = function(name) {
 	if(!(this instanceof Generic)) return new Generic(name);
