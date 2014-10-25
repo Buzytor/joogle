@@ -44,3 +44,16 @@ var Nullable = exports.Nullable = function(realType) {
 	if(!(this instanceof Nullable)) return new Nullable(realType);
 	this.realType = realType;
 };
+
+// An union type (A | B | C | ...).
+var Union = exports.Union = function(types) {
+	if(!(this instanceof Union)) return new Union(types);
+	this.types = types;
+};
+
+// Returns a type which is a union of all of given types.
+// Given Union types are merged together, producing a flat structure.
+var union = exports.union = function(types) {
+	// TODO flatten the structure
+	return Union(types);
+};
