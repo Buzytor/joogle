@@ -3,11 +3,12 @@ block content
   include header
   #details
     .result
-      h3
-        a(href=details.link)= details.name
-      ul.signatures
-        each signature in details.signatures
-          li= signature
+      .declaration
+        h3
+          a(href=details.link)= details.name
+        ul.signatures
+          each signature in details.signatures
+            li= signature
       ul.tags
         each tag in details.tags
           li= tag

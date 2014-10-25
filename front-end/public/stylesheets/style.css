@@ -15,6 +15,19 @@ h1 {
   color: #572d21;
   font-size: 60px;
   margin-bottom: 0;
+  text-decoration: none;
+  cursor: default;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+
+}
+
+h1 a {
+  color: #572d21;
+  text-decoration: none;
 }
 
 h2.tagline {
@@ -31,11 +44,12 @@ form {
 }
 
 input {
-  font-size: 24px;
+  font-size: 28px;
   background-color: #faf9f5;
   border: none;
   border-bottom: 1px #d59d2e solid;
-  padding: 0 2px;
+  padding: 4px;
+  padding-left: 8px;
   outline: none;
 }
 
@@ -45,6 +59,12 @@ input[type=text] {
 
 input[type=submit] {
   color: #572d21;
+}
+
+input[type=submit]:hover {
+  border-bottom: 1px #572d21 solid;
+  background-color: #572d21;
+  color: #d59d2e;
 }
 
 
@@ -70,12 +90,12 @@ input[type=submit] {
 }
 
 #header input {
-  font-size: 16px;
+  font-size: 20px;
 }
 
 /*** Search results ***/
 #results {
-  margin: 48px 0;
+  margin: 32px 0;
 }
 
 .result {
@@ -84,12 +104,13 @@ input[type=submit] {
 }
 
 .result:hover {
-  background-color: #e8e7e3;
+  background-color: #f4f3f0;
 }
 
 .result h3 {
   margin: 0;
   margin-bottom: 8px;
+  font-size: 18.72px;
 }
 
 .result h3 a {
@@ -114,6 +135,8 @@ input[type=submit] {
 .result h3 .type_separator,
 .result h3 .signature {
   font-family: monospace;
+  font-size: 16px;
+  font-weight: normal;
 }
 
 .result .description {
@@ -123,6 +146,8 @@ input[type=submit] {
 
 .result .tags {
   margin: 4px 0;
+  padding: 0;
+  padding-left: 24px;
 }
 
 .result .tags li {
@@ -132,12 +157,67 @@ input[type=submit] {
 
 .result .tags li:not(:last-child):after {
   content: ',';
-  margin-right: 0.4ex;
+  margin-right: 0.5ex;
 }
 
+/*** Result ***/
+#details {
+  margin-top: 32px;
+}
 
+#details .result:hover {
+  background-color: inherit;
+}
+
+#details h3 a {
+  color: #572d21;
+}
+
+#details .declaration {
+  display: table;
+}
+
+#details h3 {
+  display: table-cell;
+  padding: 0;
+}
+
+#details .signatures {
+  display: table-cell;
+  list-style: none;
+  padding: 0;
+  padding-left: 1ex;
+  font-family: monospace;
+  font-size: 16px;
+  color: #d59d2e;
+}
+
+#details .signatures li {
+  padding: 2px;
+}
+
+#details .signatures li:before {
+  content: '::';
+  margin-right: 1ex;
+}
+
+#details .description {
+  margin: 0px;
+  margin-top: 16px;
+}
+
+#details a.link {
+  color: #bf6819;
+  text-decoration: none;
+}
+
+#details a.link:hover {
+  text-decoration: underline;
+}
+
+/*** Footer ***/
 #footer {
-  margin-top: 48px;
+  margin-top: 32px;
   color: #d59d2e;
   text-align: center;
   text-transform: lowercase;
