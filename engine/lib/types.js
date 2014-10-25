@@ -81,3 +81,18 @@ var equal = exports.equal = function(typeA, typeB) {
 			}, true);
 	}
 };
+
+var typeToString = function(type) {
+	switch(type['!kind']) {
+		case 'Any':
+			return 'Any';
+		case 'Generic': case 'Simple':
+			return type.name;
+		case 'Function':
+			return type.params.reduce(function(a,b){return a+" -> "+typeToString(b);},"") + " -> " + typeToString(type.returnType);
+		case 'Object':
+			return "{}";
+		default:
+			return "ERROR"
+	}
+};
