@@ -74,6 +74,11 @@ input[type=submit]:hover {
 }
 
 /*** Header ***/
+#header {
+  width: 500px;
+  margin: 0 auto;
+}
+
 #header > * {
   display: inline-block;
   margin: 0;
@@ -91,6 +96,11 @@ input[type=submit]:hover {
 
 #header input {
   font-size: 20px;
+}
+
+#search, #details {
+  width: 512px;
+  margin: 0 auto;
 }
 
 /*** Search results ***/
