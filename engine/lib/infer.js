@@ -211,9 +211,9 @@ function flatten(arrays) {
 	return Array.prototype.concat.apply([], arrays);
 }
 
-var Scope = exports.Scope = function() {
-	this.nextGenericTypeId = 1;
-	this.vars = {};
+var Scope = exports.Scope = function(vars, nextGenericTypeId) {
+	this.nextGenericTypeId = nextGenericTypeId || 1;
+	this.vars = vars || {};
 };
 
 Scope.prototype = {
@@ -223,5 +223,10 @@ Scope.prototype = {
 
 	newType: function() {
 		return types.Generic('T' + (this.nextGenericTypeId++));
+	},
+
+	// Return a new Scope, inheriting from this Scope.
+	clone: function() {
+		return new Scope(Object.create(this.vars), this.nextGenericTypeId);
 	}
 };
