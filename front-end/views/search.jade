@@ -1,11 +1,7 @@
 extends layout
 block content
-  #search
-    #header
-      h1.search Joogle
-      form.search(action="search", method="get")
-        input(type="text", name="q", id="q")
-        input(type="submit", value="Go!")
+  include header
+  #search 
     #results
       each result in results
         .result
@@ -14,7 +10,7 @@ block content
               span.name= result.name
               span.type_separator ::
               span.signature= result.signature
-          p= result.description
-            ul
+          p.description= result.description
+            ul.tags
               each tag in result.tags
                 li= tag
