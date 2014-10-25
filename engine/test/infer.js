@@ -15,14 +15,6 @@ function test(exprStr, desiredResult) {
 
 	var result = infer.inferExpression(expr, scope);
 
-	var resultStr = result.map(function(et) {
-		return {
-			type: types.typeToString(et.type),
-			constraints: et.constraints.map(function(c) {
-				return c.toString();
-			})
-		};
-	});
 
 	if(!deepEqual(result, desiredResult)) {
 		console.log('Results dont match!');
@@ -30,7 +22,10 @@ function test(exprStr, desiredResult) {
 		printScope(rootScope);
 		console.log('------------------');
 		console.log('Input: ' + exprStr);
-		console.log(JSON.stringify(resultStr, null, 2));
+		console.log('Desired result:');
+		printETs(desiredResult);
+		console.log('Actual result:');
+		printETs(result);
 	}
 }
 
@@ -38,7 +33,8 @@ var rootScope = new infer.Scope({
 	'toString': [
 		ET(types.Fn(types.Any, [types.Generic('A')], types.Generic('String'))),
 	],
-	'x': [ ET(types.Generic('X')) ]
+	'x': [ ET(types.Generic('X')) ],
+	's': [ ET(types.Obj({ length: types.Number })) ],
 });
 
 function printScope(scope) {
@@ -49,6 +45,14 @@ function printScope(scope) {
 	});
 }
 
+function printETs(ets) {
+	ets.forEach(function(et) {
+		console.log('Expression type: ' + types.typeToString(et.type));
+		et.constraints.forEach(function(c) {
+			console.log('  ' + c.toString());
+		});
+	});
+}
 
 test(
 	'x',
@@ -63,6 +67,16 @@ test(
 		ET(G('T1'), [
 			C(types.Fn(types.Any, [G('A')], types.String),
 			  types.Fn(types.Any, [G('X')], G('T1')))
+		]),
+	]
+);
+
+test(
+	's.length',
+	[
+		ET(G('T1'), [
+			C(types.Obj({length: types.Number}),
+			  types.Obj({length: G('T1')}))
 		]),
 	]
 );

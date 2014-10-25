@@ -54,7 +54,7 @@ var exprInferrer = {
 		} else {
 			var objectETs = recurse(node.object);
 			var resultType = scope.newType();
-			var desiredObjType = objWithOneProperty(node.name, resultType);
+			var desiredObjType = objWithOneProperty(node.property.name, resultType);
 			return objectETs.map(function(objectET) {
 				return ET({
 					type: resultType,
@@ -185,7 +185,7 @@ var ET = exports.ET = function(type, constraints) {
 	if(!(this instanceof ET)) return new ET(type, constraints);
 
 	if(type.type && type.constraints) {
-		constraints = type.contstraints;
+		constraints = type.constraints;
 		type = type.type;
 	}
 
@@ -195,7 +195,9 @@ var ET = exports.ET = function(type, constraints) {
 
 ET.prototype = {
 	toString: function() {
-		return 'ET(' + types.typeToString(this.type) + ', [...])';
+		var cStr = this.constraints.map(function(c) { return c.toString(); })
+			.join(', ');
+		return 'ET(' + types.typeToString(this.type) + ', [' + cStr + '])';
 	},
 };
 
