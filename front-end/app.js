@@ -5,8 +5,8 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
-var routes = require('./routes/index');
-var users = require('./routes/users');
+//var routes = require('./routes/index');
+//var users = require('./routes/users');
 
 var app = express();
 
@@ -21,9 +21,13 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.engine('jade', require('jade').__express);
 
-app.use('/', routes);
-app.use('/users', users);
+
+app.get('/', function(req, res) {
+    res.render('index', {});
+});
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
