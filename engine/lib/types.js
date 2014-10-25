@@ -50,7 +50,7 @@ var Fn = exports.Fn = function(selfType, params, returnType) {
 	this.returnType = returnType;
 };
 Fn.prototype = {
-	'!kind': 'Generic',
+	'!kind': 'Function',
 };
 
 // A generic type, identified by name.
