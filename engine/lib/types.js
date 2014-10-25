@@ -7,6 +7,18 @@ var Simple = exports.Simple = function(name) {
 	this.name = name;
 };
 
+// Built-in JS types:
+exports.String = new Simple('String');
+exports.Number = new Simple('Number');
+exports.Boolean = new Simple('Boolean');
+exports.Array = new Simple('Array');
+exports.RegExp = new Simple('RegExp');
+
+// The type of literal 'null'.
+exports.Null = new Simple('Null');
+// The type of undefined value.
+exports.Undefined = new Simple('Undefined');
+
 // An object having given properties.
 // @param properties {Object} - mapping property names -> types.
 //    Default value: {} (matches any object)
