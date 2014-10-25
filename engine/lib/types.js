@@ -82,17 +82,20 @@ var equal = exports.equal = function(typeA, typeB) {
 	}
 };
 
-var typeToString = function(type) {
+var typeToString = exports.typeToString = function(type) {
 	switch(type['!kind']) {
 		case 'Any':
 			return 'Any';
 		case 'Generic': case 'Simple':
 			return type.name;
 		case 'Function':
-			return type.params.reduce(function(a,b){return a+" -> "+typeToString(b);},"") + " -> " + typeToString(type.returnType);
-		case 'Object':
-			return "{}";
+			return type.params.concat([type.returnType]).map(typeToString).join(" -> ");
+		case 'Obj':
+			var props = type.properties;
+			var keys = Object.getOwnPropertyNames(props);
+			var strs = keys.map(function(k){ return k+": "+typeToString(props[k]); });
+			return "{" + strs.join(", ") + "}";
 		default:
-			return "ERROR"
+			return "ERROR";
 	}
 };
