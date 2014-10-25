@@ -245,9 +245,13 @@ var renameGenericTypes = exports.renameGenericTypes = function(type, scope) {
 			case 'Function':
 				return new Fn(_rgt(type.selfType), type.params.map(_rgt), _rgt(type.returnType));
 			case 'Obj':
-				var props = type.properties;
-				var keys = Object.getOwnPropertyNames(props);
-				var strs = keys.map(function(k){ return props[k]; });
+				var tmp = {};
+				for(var k in type.properties) {
+					if(type.properties.hasOwnProperty(k)) {
+						tmp[k] = _rgt(type.properties[k]);
+					}
+				}
+				return types.Obj(tmp);
 			case 'Any':	case 'Simple': default:
 				return type;
 		}
