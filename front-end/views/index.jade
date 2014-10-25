@@ -1,9 +1,9 @@
 extends layout
 block content
-  h1 Joogle
-  form(action="search", method="get")
+  h1.landing Joogle
+  form.landing(action="search", method="get")
     input(type="text", name="q", id="q")
     input(type="submit", value="Go!")
-   #footer
-     p By &nbsp;
-       a(href='http://buzytor.com') Buzytor
+  #footer.landing
+    p By &nbsp;
+      a(href='http://buzytor.com') Buzytor

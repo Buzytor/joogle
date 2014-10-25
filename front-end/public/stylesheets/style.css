@@ -1,9 +1,25 @@
 body {
-  padding: 50px;
+  padding-left: 5px;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+.landing{
   text-align: center;
+}
+
+.search {
+  display: inline-block;
+}
+
+#header .search {
+  margin: 0; 
+}
+
+#results {
+  margin: 10px;
 }
 
 a {
   color: #00B7FF;
+  text-decoration: none;
 }
