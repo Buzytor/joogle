@@ -1,10 +1,18 @@
 // A module with data structures for type expressions.
+//
+// Each "type type" (let's call it kind) is identified
+// by '!kind' property. The 'equal' function uses this.
 
-var Any = exports.Any = {};
+var Any = exports.Any = {
+	'!kind': 'Any',
+};
 
 // Built-in JS type. Example: String, Number
 var Simple = exports.Simple = function(name) {
 	this.name = name;
+};
+Simple.prototype = {
+	'!kind': 'Simple',
 };
 
 // Built-in JS types:
@@ -26,6 +34,9 @@ var Obj = exports.Obj = function(properties) {
 	if(!(this instanceof Obj)) return new Obj(properties);
 	this.properties = properties || {};
 };
+Obj.prototype = {
+	'!kind': 'Obj',
+};
 
 // A function.
 // @param selfType {Object} - the type of 'this'.
@@ -38,9 +49,32 @@ var Fn = exports.Fn = function(selfType, params, returnType) {
 	this.params = params;
 	this.returnType = returnType;
 };
+Fn.prototype = {
+	'!kind': 'Generic',
+};
 
 // A generic type, identified by name.
 var Generic = exports.Generic = function(name) {
 	if(!(this instanceof Generic)) return new Generic(name);
 	this.name = name;
+};
+Generic.prototype = {
+	'!kind': 'Generic',
+};
+
+
+// Check whether typeA is equal to typeB.
+var equal = exports.equal = function(typeA, typeB) {
+	if(typeA['!kind'] != typeB['!kind'])
+		return false;
+	if(!typeA['!kind']) {
+		// both are primitive values
+		return true;
+	}
+	if(typeA.equals) {
+		return typeA.equals(typeB);
+	} else {
+		// TODO iterate over Object.keys(typeA) and Object.keys(typeB)
+		// and compare typeA[x] == typeB[x]
+	}
 };
