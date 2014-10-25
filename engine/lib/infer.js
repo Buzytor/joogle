@@ -222,6 +222,6 @@ Scope.prototype = {
 	},
 
 	newType: function() {
-		return t.Generic('T' + (this.typeCounter++));
+		return types.Generic('T' + (this.nextGenericTypeId++));
 	}
 };
