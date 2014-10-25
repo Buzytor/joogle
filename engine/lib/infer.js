@@ -18,7 +18,7 @@ var inferExpression = exports.inferExpression = function(node, scope) {
 
 var exprInferrer = {
 	ThisExpression: function(node, scope) {
-		return ET(scope.get('this'));
+		return scope.get('this');
 	},
 	ArrayExpression: function(node, scope, recurse) {
 		throw new Error('Array not implemented');
@@ -40,7 +40,7 @@ var exprInferrer = {
 	},
 	FunctionExpression: function(node, scope, recurse) {
 		console.warn('TODO: nested functions not implemented');
-		return ET(Fn(Any, [], Any));
+		return [ ET(Fn(Any, [], Any)) ];
 	},
 	CallExpression: function(node, scope, recurse) {
 		var calleeETs = recurse(node.callee);
@@ -56,21 +56,21 @@ var exprInferrer = {
 			var resultType = scope.newType();
 			var desiredObjType = objWithOneProperty(node.name, resultType);
 			return objectETs.map(function(objectET) {
-				return {
+				return ET({
 					type: resultType,
 					constraints: [].concat(
 						objectET.constraints,
 						[Constraint(objectET.type, desiredObjType)]
 					)
-				};
+				});
 			});
 		}
 	},
 	Identifier: function(node, scope) {
-		return ET(scope.get(node.name));
+		return scope.get(node.name);
 	},
 	Literal: function(node, scope) {
-		return ET(getLiteralType(node.value));
+		return [ ET(getLiteralType(node.value)) ];
 	},
 };
 
@@ -163,15 +163,40 @@ exports.possibleCallETs = possibleCallETs;
 
 // a constraint requiring that a == b
 var Constraint = exports.Constraint = function(a, b) {
-	return { a: a, b: b };
+	if(!(this instanceof Constraint)) return new Constraint(a, b);
+
+	if(!(a && b))
+		throw new Error('Got null types!');
+
+	this.a = a;
+	this.b = b;
+};
+
+Constraint.prototype = {
+	toString: function() {
+		return types.typeToString(this.a) + ' === ' + types.typeToString(this.b);
+	}
 };
 
 // ET - "expression type", result of inference
 // type :: Type
 // constraints :: [Constraint]
 var ET = exports.ET = function(type, constraints) {
+	if(!(this instanceof ET)) return new ET(type, constraints);
+
+	if(type.type && type.constraints) {
+		constraints = type.contstraints;
+		type = type.type;
+	}
+
 	this.type = type;
 	this.constraints = constraints || [];
+};
+
+ET.prototype = {
+	toString: function() {
+		return 'ET(' + types.typeToString(this.type) + ', [...])';
+	},
 };
 
 function map(a, f) {
