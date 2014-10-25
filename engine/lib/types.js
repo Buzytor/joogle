@@ -29,7 +29,7 @@ exports.Undefined = new Simple('Undefined');
 
 // An object having given properties.
 // @param properties {Object} - mapping property names -> types.
-//    Default value: {} (matches any object)
+//	Default value: {} (matches any object)
 var Obj = exports.Obj = function(properties) {
 	if(!(this instanceof Obj)) return new Obj(properties);
 	this.properties = properties || {};
@@ -40,7 +40,7 @@ Obj.prototype = {
 
 // A function.
 // @param selfType {Object} - the type of 'this'.
-//     There are functions that don't need this, so it can be Any.
+//	 There are functions that don't need this, so it can be Any.
 // @param params {Array} - types of parameters.
 // @param returnType {Object} - 
 var Fn = exports.Fn = function(selfType, params, returnType) {
@@ -74,7 +74,14 @@ var equal = exports.equal = function(typeA, typeB) {
 	if(typeA.equals) {
 		return typeA.equals(typeB);
 	} else {
-		// TODO iterate over Object.keys(typeA) and Object.keys(typeB)
-		// and compare typeA[x] == typeB[x]
+
+		var keysTypeA = Object.keys(typeA);
+		
+		keysTypeA.forEach(function(key){
+			if(!(typeA[key] == typeB[key])) {
+					return false;
+				}
+			});
+		return true;
 	}
 };
