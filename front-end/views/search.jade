@@ -8,9 +8,10 @@ block content
   #results
     each result in results
       h2
-        span.name= result.name
-        span.type_separator  :: 
-        span.signature= result.signature 
+        a(href="details/" + result.name)
+          span.name= result.name
+          span.type_separator  :: 
+          span.signature= result.signature 
       p= result.description
         ul
           each tag in result.tags

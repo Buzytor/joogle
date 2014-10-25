@@ -1,0 +1,17 @@
+extends layout
+block content
+  #header
+    h1.search Joogle
+    form.search(action="search", method="get")
+      input(type="text", name="q", id="q")
+      input(type="submit", value="Go!")
+  #result
+    h1
+      a(href=details.link)= details.name
+    ul
+      each signature in details.signatures
+        li= signature
+    ul
+      each tag in details.tags
+        li= tag
+    p= details.description

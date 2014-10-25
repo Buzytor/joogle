@@ -25,7 +25,7 @@ var getDetails = function(fnName) {
     return new Promise(function(resolve, reject) {
         resolve({
             "name": fnName,
-            "signatures": [],
+            "signatures": ["(a -> b) -> [a] -> [b]", "(a -> a) -> [a] -> [a]"],
             "tags": ["alpha", "beta", fnName],
             "description": fnName + " is a great function",
             "link": "http://npmjs.org/"
