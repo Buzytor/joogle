@@ -1,5 +1,11 @@
 extends layout
 
-block content
-  h1= title
-  p Welcome to #{title}
+doctype html
+html(lang=en)
+  
+  head
+    title= Joogle
+  
+  body
+    form(action="search", method="get")
+      input(type="text", name="q", id="q")
