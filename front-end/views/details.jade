@@ -2,12 +2,12 @@ extends layout
 block content
   include header
   #result
-    h2
+    h3
       a(href=details.link)= details.name
-    ul
+    ul.signatures
       each signature in details.signatures
         li= signature
-    ul
+    ul.tags
       each tag in details.tags
         li= tag
-    p= details.description
+    p.description= details.description
