@@ -2,8 +2,8 @@
 
 var Any = exports.Any = {};
 
-// Type defined externally. Example: String, Number
-var External = exports.External = function(name) {
+// Built-in JS type. Example: String, Number
+var Simple = exports.Simple = function(name) {
 	this.name = name;
 };
 
