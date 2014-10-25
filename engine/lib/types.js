@@ -84,6 +84,6 @@ var typeToString = exports.typeToString = function(type) {
 			var strs = keys.map(function(k){ return k+": "+typeToString(props[k]); });
 			return "{" + strs.join(", ") + "}";
 		default:
-			return "ERROR";
+			return "ERROR: "+type;
 	}
 };
