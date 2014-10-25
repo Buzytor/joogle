@@ -62,7 +62,7 @@ app.use(function(req, res, next){
 });
 
 app.get('/', function(req, res) {
-    res.render('index', {title: "Joogle"});
+    res.render('index', {});
 });
 
 app.get('/search', function(req, res) {
@@ -70,7 +70,7 @@ app.get('/search', function(req, res) {
 	var query = req.query.q;
     getResults(query).then(function(obj) {
         var results = obj.results;
-        res.render('search', {"results": results});
+        res.render('search', {"results": results, "title": query+" :: Search results :: "});
     });
 
 });
@@ -78,7 +78,7 @@ app.get('/search', function(req, res) {
 app.get('/details/:name', function(req, res) {
     var name = req.params.name;
     getDetails(name).then(function(obj) {
-        res.render('details', {"details": obj});
+        res.render('details', {"details": obj, "title": name+" :: "});
     });
 });
 
