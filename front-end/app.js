@@ -6,6 +6,11 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var Promise = require('bluebird');
 
+var mongo = require('mongodb');
+var monk = require('monk');
+var db = monk('localhost:27017/joogle');
+
+
 var app = express();
 
 // view engine setup
@@ -51,12 +56,18 @@ var getResults = function(query) {
     });
 };
 
+app.use(function(req, res, next){
+	res.db = db;
+	next();
+});
+
 app.get('/', function(req, res) {
     res.render('index', {title: "Joogle"});
 });
 
 app.get('/search', function(req, res) {
-    var query = req.query.q;
+    //TODO Add db integration
+	var query = req.query.q;
     getResults(query).then(function(obj) {
         var results = obj.results;
         res.render('search', {"results": results});
@@ -100,7 +111,7 @@ app.use(function(err, req, res, next) {
         message: err.message,
         error: {}
     });
-});
+})
 
 
 module.exports = app;
