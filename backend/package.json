@@ -1,0 +1,10 @@
+{
+  "name": "joogle-backend",
+  "version": "0.0.1",
+  "description": "",
+  "main": "package-handler.js",
+  "author": "KrzyStar",
+  "dependencies": {
+    "npm": "*"
+  }
+}
