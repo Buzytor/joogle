@@ -76,12 +76,8 @@ var equal = exports.equal = function(typeA, typeB) {
 	} else {
 
 		var keysTypeA = Object.keys(typeA);
-		
-		keysTypeA.forEach(function(key){
-			if(!(typeA[key] == typeB[key])) {
-					return false;
-				}
-			});
-		return true;
+		return keysTypeA.reduce(function(previous, key){
+				return previous && typeA[key] == typeB[key];
+			}, true);
 	}
 };
