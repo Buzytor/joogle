@@ -3,6 +3,8 @@
 // Each "type type" (let's call it kind) is identified
 // by '!kind' property. The 'equal' function uses this.
 
+var deepEqual = require('deep-equal');
+
 var Any = exports.Any = {
 	'!kind': 'Any',
 };
@@ -65,21 +67,7 @@ Generic.prototype = {
 
 // Check whether typeA is equal to typeB.
 var equal = exports.equal = function(typeA, typeB) {
-	if(typeA['!kind'] != typeB['!kind'])
-		return false;
-	if(!typeA['!kind']) {
-		// both are primitive values
-		return true;
-	}
-	if(typeA.equals) {
-		return typeA.equals(typeB);
-	} else {
-
-		var keysTypeA = Object.keys(typeA);
-		return keysTypeA.reduce(function(previous, key){
-				return previous && typeA[key] == typeB[key];
-			}, true);
-	}
+	return deepEqual(typeA, typeB);
 };
 
 var typeToString = exports.typeToString = function(type) {
