@@ -57,3 +57,9 @@ var union = exports.union = function(types) {
 	// TODO flatten the structure
 	return Union(types);
 };
+
+// A generic type, identified by name.
+var Generic = exports.Generic = function(name) {
+	if(!(this instanceof Generic)) return new Generic(name);
+	this.name = name;
+};
