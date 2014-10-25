@@ -21,6 +21,18 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+var getDetails = function(fnName) {
+    return new Promise(function(resolve, reject) {
+        resolve({
+            "name": fnName,
+            "signatures": [],
+            "tags": ["alpha", "beta", fnName],
+            "description": fnName + " is a great function",
+            "link": "http://npmjs.org/"
+        });
+    });
+};
+
 var getResults = function(query) {
     return new Promise(function(resolve, reject) {
         resolve( {"results": [
@@ -37,7 +49,7 @@ var getResults = function(query) {
                     }
         ]});
     });
-}
+};
 
 app.get('/', function(req, res) {
     res.render('index', {title: "Joogle"});
@@ -50,6 +62,13 @@ app.get('/search', function(req, res) {
         res.render('search', {"results": results});
     });
 
+});
+
+app.get('/details/:name', function(req, res) {
+    var name = req.params.name;
+    getDetails(name).then(function(obj) {
+        res.render('details', {"details": obj});
+    });
 });
 
 // catch 404 and forward to error handler
