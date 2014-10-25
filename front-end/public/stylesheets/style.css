@@ -18,6 +18,15 @@ h1 {
   margin-bottom: 0;
 }
 
+h2 {
+  color: #bf6819;
+  font-size: 12px;
+  font-weight: 300;
+  text-align: center;
+  text-transform: uppercase;
+  margin-top: 8px;
+}
+
 form {
   margin-top: 48px;
 }
