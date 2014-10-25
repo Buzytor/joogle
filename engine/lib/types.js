@@ -89,7 +89,7 @@ var typeToString = exports.typeToString = function(type) {
 		case 'Generic': case 'Simple':
 			return type.name;
 		case 'Function':
-			return type.params.concat([type.returnType]).map(typeToString).join(" -> ");
+			return "("+type.params.map(typeToString).join(", ")+") -> "+typeToString(type.returnType);
 		case 'Obj':
 			var props = type.properties;
 			var keys = Object.getOwnPropertyNames(props);
