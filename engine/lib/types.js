@@ -23,6 +23,7 @@ exports.Undefined = new Simple('Undefined');
 // @param properties {Object} - mapping property names -> types.
 //    Default value: {} (matches any object)
 var Obj = exports.Obj = function(properties) {
+	if(!(this instanceof Obj)) return new Obj(properties);
 	this.properties = properties || {};
 };
 
@@ -32,6 +33,7 @@ var Obj = exports.Obj = function(properties) {
 // @param params {Array} - types of parameters.
 // @param returnType {Object} - 
 var Fn = exports.Fn = function(selfType, params, returnType) {
+	if(!(this instanceof Fn)) return new Fn(selfType, params, returnType);
 	this.selfType = selfType;
 	this.params = params;
 	this.returnType = returnType;
@@ -39,5 +41,6 @@ var Fn = exports.Fn = function(selfType, params, returnType) {
 
 // A synonym for (realType | null).
 var Nullable = exports.Nullable = function(realType) {
+	if(!(this instanceof Nullable)) return new Nullable(realType);
 	this.realType = realType;
 };
