@@ -1,18 +1,19 @@
 extends layout
 block content
-  #header
-    h1.search Joogle
-    form.search(action="search", method="get")
-      input(type="text", name="q", id="q")
-      input(type="submit", value="Go!")
-  #results
-    each result in results
-      h2
-        a(href="details/" + result.name)
-          span.name= result.name
-          span.type_separator  :: 
-          span.signature= result.signature 
-      p= result.description
-        ul
-          each tag in result.tags
-            li= tag
+  #search
+    #header
+      h1.search Joogle
+      form.search(action="search", method="get")
+        input(type="text", name="q", id="q")
+        input(type="submit", value="Go!")
+    #results
+      each result in results
+        h2
+          a(href="details/" + result.name)
+            span.name= result.name
+            span.type_separator  :: 
+            span.signature= result.signature 
+        p= result.description
+          ul
+            each tag in result.tags
+              li= tag

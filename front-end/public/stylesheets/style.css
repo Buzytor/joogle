@@ -8,7 +8,6 @@
 
 body {
   background-color: #faf9f5;
-  padding: 72px 0;
   font-family: "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
@@ -36,6 +35,7 @@ input {
   background-color: #faf9f5;
   border: none;
   border-bottom: 1px #d59d2e solid;
+  padding: 0 2px;
   outline: none;
 }
 
@@ -44,20 +44,35 @@ input[type=text] {
 }
 
 input[type=submit] {
-  margin-left: -1px;
   color: #572d21;
 }
 
-.landing{
+
+#landing{
   text-align: center;
+  padding: 72px 0;
 }
 
-.search {
+
+/******* SEARCH ********/
+/*** Header ***/
+#search #header > * {
   display: inline-block;
+  margin: 0;
 }
 
-#header .search {
-  margin: 0;
+#search #header h1 {
+  font-size: 48px;
+  margin-right: 24px;
+}
+
+#search #header form {
+  position: relative;
+  top: -4px;
+}
+
+#search #header input {
+  font-size: 16px;
 }
 
 #results {
