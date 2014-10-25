@@ -1,13 +1,14 @@
 extends layout
 block content
   include header
-  #result
-    h3
-      a(href=details.link)= details.name
-    ul.signatures
-      each signature in details.signatures
-        li= signature
-    ul.tags
-      each tag in details.tags
-        li= tag
-    p.description= details.description
+  #details
+    .result
+      h3
+        a(href=details.link)= details.name
+      ul.signatures
+        each signature in details.signatures
+          li= signature
+      ul.tags
+        each tag in details.tags
+          li= tag
+      p.description= details.description
