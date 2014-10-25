@@ -27,7 +27,10 @@ app.get('/', function(req, res) {
     res.render('index', {title: "Joogle"});
 });
 
+app.get('/search', function(req, res) {
 
+    res.render('search', {});
+});
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
     var err = new Error('Not Found');
