@@ -210,3 +210,18 @@ function flatMap(array, f) {
 function flatten(arrays) {
 	return Array.prototype.concat.apply([], arrays);
 }
+
+var Scope = exports.Scope = function() {
+	this.nextGenericTypeId = 1;
+	this.vars = {};
+};
+
+Scope.prototype = {
+	get: function(key) {
+		return this.vars[key];
+	},
+
+	newType: function() {
+		return t.Generic('T' + (this.typeCounter++));
+	}
+};
