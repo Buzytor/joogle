@@ -230,3 +230,25 @@ Scope.prototype = {
 		return new Scope(Object.create(this.vars), this.nextGenericTypeId);
 	}
 };
+
+var renameGenericTypes = exports.renameGenericTypes = function(type, scope) {
+	var cache = {};
+	var _rgt = function(type) {
+		switch(type['!kind']) {
+			case 'Generic':
+				if(cache[type.name] == undefined) {
+					cache[type.name] = scope.newType();
+				}
+				return cache[type.name];
+			case 'Function':
+				return new Fn(_rgt(type.selfType), type.params.map(_rgt), _rgt(type.returnType));
+			case 'Obj':
+				var props = type.properties;
+				var keys = Object.getOwnPropertyNames(props);
+				var strs = keys.map(function(k){ return props[k]; });
+			case 'Any':	case 'Simple': default:
+				return type;
+		}
+	};
+	return _rgt(type);
+};
