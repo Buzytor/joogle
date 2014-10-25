@@ -1,11 +1,4 @@
 extends layout
-
-doctype html
-html(lang=en)
-  
-  head
-    title= Joogle
-  
-  body
-    form(action="search", method="get")
-      input(type="text", name="q", id="q")
+block content
+  form(action="search", method="get")
+    input(type="text", name="q", id="q")
