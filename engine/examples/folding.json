@@ -1,1 +1,1 @@
-{ 'func1': {'A', 'B', 'R'}: [['Int', 'Int', 'String'], ['X', 'Y', 'Z']]  }
+{ 'func1': [['A', 'B', 'R'], [['Int', 'Int', 'String'], ['X', 'Y', 'Z']]] }
