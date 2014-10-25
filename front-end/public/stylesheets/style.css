@@ -204,11 +204,13 @@ input[type=submit]:hover {
 #details .description {
   margin: 0px;
   margin-top: 16px;
+  margin-bottom: 16px;
 }
 
 #details a.link {
   color: #bf6819;
   text-decoration: none;
+  font-size: 14px;
 }
 
 #details a.link:hover {
