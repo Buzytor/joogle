@@ -64,7 +64,16 @@ input[type=submit] {
   margin: 10px;
 }
 
+
+#footer {
+  margin-top: 48px;
+  color: #d59d2e;
+  text-align: center;
+  text-transform: lowercase;
+  font-size: 14px;
+}
+
 a {
-  color: #00B7FF;
+  color: #6293c2;
   text-decoration: none;
 }
