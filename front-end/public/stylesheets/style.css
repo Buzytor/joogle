@@ -53,25 +53,23 @@ input[type=submit] {
   padding: 72px 0;
 }
 
-
-/******* SEARCH ********/
 /*** Header ***/
-#search #header > * {
+#header > * {
   display: inline-block;
   margin: 0;
 }
 
-#search #header h1 {
+#header h1 {
   font-size: 48px;
   margin-right: 24px;
 }
 
-#search #header form {
+#header form {
   position: relative;
   top: -4px;
 }
 
-#search #header input {
+#header input {
   font-size: 16px;
 }
 
