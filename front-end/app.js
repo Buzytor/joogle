@@ -59,7 +59,8 @@ var getDetails = function(fnName) {
 	try {
 	    dbConnect(function(err, db){
 		if(err) { throw err; }
-		db.signatures.find({"name": fnName}).toArray(function(err, results) {
+		var signatures = db.collection('signatures');
+		signatures.find({"name": fnName}).toArray(function(err, results) {
 		    if(err) { throw err; }
 		    db.close();
 		    resolve(results);
@@ -114,7 +115,7 @@ app.get('/search', function(req, res) {
 app.get('/details/:name', function(req, res) {
     var name = req.params.name;
     getDetails(name).then(function(obj) {
-        res.render('details', {"details": obj, "title": name+" :: "});
+        res.render('details', {"results": obj, "title": name+" :: "});
     }).catch(function(err) {
 	res.status(500).send("DB error: "+err);
     });
