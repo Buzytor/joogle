@@ -62,3 +62,13 @@ module.exports.moreStuff = function(a, b) {
 	return  ret.length + x + tab[0] + y;
 };
 
+module.exports.mutliply = function(a, b) {
+	return a * b;
+};
+
+module.exports.first =  function(a) {
+	return a[0];
+};
+module.exports.last = function(a) {
+	return a[a.length-1];
+};
