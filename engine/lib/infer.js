@@ -10,7 +10,7 @@ var walkRecursive = exports.walkRecursive =
 		function(visitor, node, state) {
 			function recurse(node) {
 				var ret = visitor[node.type](node, state, recurse);
-				console.log(node.type, ret);
+				//console.log(node.type, ret);
 				return ret;
 			}
 			return recurse(node);
@@ -88,7 +88,7 @@ var exprInferrer = {
 			function evalType(t) {
 				return solver.evaluateType(t);
 			}
-			console.log(fnType);
+			console.log('fnType', types.typeToString(fnType));
 
 			return ET(renameGenericTypes(fnType, parentScope));
 		});
@@ -120,12 +120,25 @@ var exprInferrer = {
 		return inferCall(calleeETs, argsETs, scope);
 	},
 	MemberExpression: function(node, scope, recurse) {
+		var objectETs = recurse(node.object);
+		var resultType = scope.newType();
 		if(node.computed) {
-			console.warn('Computed member expr not implemented');	
-			return Any;
+			var propETs = recurse(node.property);
+			return flatMap(objectETs, function(objectET) {
+				return flatMap(propETs, function(propET) {
+					console.log('ARRAI MEMBER');
+					return debug.printET(ET({
+						type: resultType,
+						constraints: [].concat(
+							objectET.constraints,
+							propET.constraints,
+							Constraint(objectET.type, types.Arr(resultType)),
+							Constraint(propET.type, types.Number)
+						)
+					}));
+				});
+			});
 		} else {
-			var objectETs = recurse(node.object);
-			var resultType = scope.newType();
 			var desiredObjType = objWithOneProperty(node.property.name, resultType);
 			return objectETs.map(function(objectET) {
 				return ET({
@@ -149,14 +162,14 @@ var exprInferrer = {
 		var rhsETs = recurse(node.right);
 		return flatMap(lhsETs, function(lhsET) {
 			return flatMap(rhsETs, function(rhsET) {
-				return debug.printET(ET({
+				return ET({
 					type: rhsET.type,
 					constraints: [].concat(
 						lhsET.constraints,
 						rhsET.constraints,
 						Constraint(lhsET.type, rhsET.type)
 					)
-				}));
+				});
 			});
 		});
 	},
@@ -203,6 +216,7 @@ var inferModule = exports.inferModule = function(node) {
 	scope.set('module', [ ET(types.Obj({ exports: exportsType })) ]);
 	var cSets = inferStatement(node, scope);
 	return cSets.map(function(cSet) {
+		debug.printCSet(cSet);
 		var solver = new ConstraintSolver();
 		cSet.forEach(function(constraint) {
 			solver.addConstraint(constraint);

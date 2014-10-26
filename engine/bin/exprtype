@@ -14,5 +14,9 @@ var scope = new infer.Scope();
 var ets = infer.inferExpression(expr, scope);
 
 ets.forEach(function(et) {
-	console.log(types.typeToString(infer.normalizeType(et.type)));
+	console.log(types.typeToString(
+		// infer.normalizeType(
+			et.type
+		// )
+	));
 });
