@@ -208,6 +208,19 @@ var statementInferrer = {
 			});
 		});
 	},
+	VariableDeclaration: function(node, scope, recurse) {
+		return andConstraints(node.declarations.map(recurse));
+	},
+	VariableDeclarator: function(node, scope, recurse) {
+		var valETs;
+		if(node.init) {
+			valETs = inferExpression(node.init, scope);
+		} else {
+			valETs = [ ET(scope.newType()) ];
+		}
+		scope.set(node.id.name, valETs);
+		return valETs.map(etConstraints);
+	},
 };
 
 var inferModule = exports.inferModule = function(node) {
