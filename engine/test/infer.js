@@ -91,3 +91,10 @@ test(
 		]),
 	]
 );
+
+test(
+	'function(a) { return a; }',
+	[
+		ET(types.Fn(types.Any, [G('T1')], G('T1'))),
+	]
+);

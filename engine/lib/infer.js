@@ -1,6 +1,7 @@
 // Magic inference engine.
 
 var types = require('./types');
+var ConstraintSolver = require('./constraintSolver').solver;
 
 var Fn = types.Fn, Obj = types.Obj, Any = types.Any;
 
@@ -38,9 +39,36 @@ var exprInferrer = {
 		}
 		throw new Error('ObjectExpr not implemented');
 	},
-	FunctionExpression: function(node, scope, recurse) {
-		console.warn('TODO: nested functions not implemented');
-		return [ ET(Fn(Any, [], Any)) ];
+	FunctionExpression: function(node, parentScope, recurse) {
+		var paramNames = node.params.map(function(param) { return param.name; });
+		if(node.expression || node.generator) {
+			throw new Error('Weird ES6-only shit not supported');
+		}
+		var scope = parentScope.clone();
+		var paramTypes = {};
+		paramNames.forEach(function(name) {
+			var type = scope.newType();
+			scope.set(name, [ ET(type) ]);
+			paramTypes[name] = type;
+		});
+		var returnType = scope.newType();
+		scope.set('return', [ ET(returnType) ]);
+		var constraintSets = inferStatement(node.body, scope);
+		return constraintSets.map(function(cSet) {
+			var solver = new ConstraintSolver();
+			cSet.forEach(function(constraint) {
+				solver.addConstraint(constraint);
+			});
+			var evalReturnType = solver.evaluateType(returnType);
+			console.log('eval(' + types.typeToString(returnType)
+						+ ') = ' + types.typeToString(evalReturnType));
+			var fnType = Fn(Any, paramNames.map(function(name) {
+				return solver.evaluateType(paramTypes[name]);
+			}), evalReturnType);
+			//console.log(JSON.stringify(solver, null, 2));
+
+			return ET(renameGenericTypes(fnType, parentScope));
+		});
 	},
 	CallExpression: function(node, scope, recurse) {
 		var calleeETs = recurse(node.callee);
@@ -94,6 +122,51 @@ var exprInferrer = {
 		return [ ET(getLiteralType(node.value)) ];
 	},
 };
+
+var inferStatement = function(node, scope) {
+	return walkRecursive(statementInferrer, node, scope);
+};
+
+var statementInferrer = {
+	ExpressionStatement: function(node, scope, recurse) {
+		return inferExpression(node.expression, scope).map(etConstraints);
+	},
+	BlockStatement: function(node, scope, recurse) {
+		return andConstraints(node.body.map(recurse));
+	},
+	EmptyStatement: function(node, scope, recurse) {
+		return [[]];
+	},
+	LabeledStatement: function(node, scope, recurse) {
+		return recurse(node.body);
+	},
+	ReturnStatement: function(node, scope, recurse) {
+		var argETs = inferExpression(node.argument, scope);
+		return andConstraints(flatMap(scope.get('return'), function(retET) {
+			return argETs.map(function(argET) {
+				return [].concat(
+					argET.constraints,
+					retET.constraints,
+					[Constraint(retET.type, argET.type)]
+				);
+			});
+		}));
+	},
+};
+
+// [[[Constraints]]] -> [[Constraints]]
+function andConstraints(cSetSets) {
+	return cSetSets.reduce(function(accs, cSets) {
+		// accs :: [[C]], cSets :: [[C]]
+		return flatMap(accs, function(acc) {
+			return map(cSets, function(cSet) {
+				return acc.concat(cSet); // [C]
+			}); // [C]
+		}); // [[C]]
+	}, [[]]);
+}
+
+exports.andConstraints = andConstraints;
 
 function objWithOneProperty(name, valueT) {
 	var properties = {};
@@ -256,7 +329,13 @@ var Scope = exports.Scope = function(vars, nextGenericTypeId) {
 
 Scope.prototype = {
 	get: function(key) {
+		if(!this.vars[key])
+			throw new Error('Undefined variable: ' + key);
 		return this.vars[key];
+	},
+
+	set: function(key, type) {
+		this.vars[key] = type;
 	},
 
 	newType: function() {
