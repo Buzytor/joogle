@@ -1,0 +1,18 @@
+#!/usr/bin/env node
+
+var infer = require('../lib/infer');
+var types = require('../lib/types');
+var acorn = require('acorn');
+
+function parseExpr(str) {
+	return acorn.parseExpressionAt(str, 0);
+}
+
+var expr = parseExpr(process.argv[2]);
+
+var scope = new infer.Scope();
+var ets = infer.inferExpression(expr, scope);
+
+ets.forEach(function(et) {
+	console.log(types.typeToString(infer.normalizeType(et.type)));
+});

@@ -383,3 +383,15 @@ var renameGenericTypes = exports.renameGenericTypes = function(type, scope) {
 	};
 	return _rgt(type);
 };
+
+
+var normalizeType = exports.normalizeType = function(type) {
+	var scope = {
+		counter: 65,
+		newType: function() {
+			return types.Generic(String.fromCharCode(this.counter++));
+		}
+	};
+	return renameGenericTypes(type, scope);
+};
+
