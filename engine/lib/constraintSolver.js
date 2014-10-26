@@ -1,4 +1,5 @@
 var types = require("./types");
+var infer = require("./infer");
 
 function ConstraintGraph() {
   this.nodes = [ ];
@@ -20,7 +21,7 @@ function ConstraintGraph() {
     this.size++;
   }
 
-  this.addConstraint = function(kind1, kind2) {
+  this.addSimpleConstraint = function(kind1, kind2) {
     var kind1id = this.findNode(kind1);
     var kind2id = this.findNode(kind2);
 
@@ -103,13 +104,34 @@ function ConstraintGraph() {
 
     return appliedKind;
   }
+
+  this.addConstraint = function(constraint) {
+    var a = constraint.a;
+    var b = constraint.b;
+    if(a instanceof types.Generic || b instanceof types.Generic)
+      this.addSimpleConstraint(a, b);
+    else if(a instanceof types.Fn && b instanceof types.Fn &&
+        a.params.length == b.params.length) {
+      this.addSimpleConstraint(a.selfType, b.selfType);
+      this.addSimpleConstraint(a.returnType, b.returnType);
+      for(var i = 0; i < a.params.length; i++)
+        this.addSimpleConstraint(a.params[i], b.params[i]);
+    } else if(!(types.equal(a, b))) {
+      console.log('Error matching constraint', a, b);
+    }
+  };
 }
 
 exports.solver = ConstraintGraph;
 
 /*
+var constraint1 = infer.Constraint(types.Fn(types.Any, [types.Generic('A')], types.String), types.Fn(types.Any, [types.Generic('X')], types.Generic('T1')));
+
 var graph = new exports.solver();
-graph.addConstraint(types.Generic('C'), types.Generic('A'));
+graph.addConstraint(constraint1);
+console.log(graph.evaluateType(types.Generic('A')));
+*/
+/*
 graph.addConstraint(types.Generic('A'), types.Fn(types.Number, [types.Number], types.Number));
 graph.addConstraint(types.Generic('C'), types.Fn(types.Number, [types.Number], types.String));
 graph.addConstraint(types.Generic('E'), types.Generic('D'));
