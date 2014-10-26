@@ -26,9 +26,15 @@ function packageFetch(packageName, packageDir, callback) {
   });
 }
 
-function packageParse(fileList) {
-  console.log(fileList);
-  // do 4w3s0m3 stuff in hier
+function getPackageFiles(fileList) {
+  var result = { };
+  for(var i = 0; i < fileList.length; i++) {
+    // do 4w3s0m3 stuff in hier
+    console.log(fileList[i]);
+    result[fileList[i]] = '' + fs.readFileSync(fileList[i]);
+  }
+  console.log(result);
+  return result;
 }
 
-packageFetch('watchify', '/tmp', packageParse);
+getPackageFiles(['package-example.js']);
