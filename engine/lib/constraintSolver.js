@@ -164,11 +164,24 @@ function ConstraintGraph() {
       for(attr in a.properties) {
         this.addSimpleConstraint(a.properties[attr], b.properties[attr]);
 	  }
+	} else if(b instanceof types.Obj && a instanceof types.Arr) {
+		this.matchArrayObj(a, b);
+	} else if(a instanceof types.Obj && b instanceof types.Arr) {
+		this.matchArrayObj(b, a);
     } else if(!(types.equal(a, b))) {
       console.log('Error matching constraint',
 			  types.typeToString(a) + ' === ' + types.typeToString(b));
     }
   };
+
+  this.matchArrayObj = function(array, obj) {
+	if(obj.properties.length) {
+		this.addConstraint({a: obj.properties.length, b: types.Number});
+	}
+	if(obj.properties.push) {
+		this.addConstraint({a: obj.properties.push, b: types.Fn(types.Any, [array.elementType], types.Number)});
+	}
+  }
 }
 
 exports.solver = ConstraintGraph;
