@@ -112,7 +112,17 @@ function ConstraintGraph() {
         this.nodes[kinds[i][1]].resultKind = appliedKind;
     }
 
-    return appliedKind;
+    if(appliedKind instanceof types.Fn) {
+      appliedKind.selfType = this.evaluateType(appliedKind.selfType);
+      appliedKind.returnType = this.evaluateType(appliedKind.returnType);
+      for(var i = 0; i < appliedKind.params.length; i++)
+        appliedKind.params[i] = this.evaluateType(appliedKind.params[i]);
+    } else if(appliedKind instanceof types.Obj) {
+      for(attr in appliedKind.properties)
+        appliedKind.properties[attr] = this.evaluateType(appliedKind.properties[attr]);
+    } else {
+      return appliedKind;
+    }
   }
 
   this.addConstraint = function(constraint) {
