@@ -138,7 +138,8 @@ function ConstraintGraph() {
     } else if(a instanceof types.Obj && b instanceof types.Obj && a.mergedWith(b) != 'failed') {
       this.addSimpleConstraint(a, b);
     } else if(!(types.equal(a, b))) {
-      console.log('Error matching constraint', a, b);
+      console.log('Error matching constraint',
+			  types.typeToString(a) + ' === ' + types.typeToString(b));
     }
   };
 }
