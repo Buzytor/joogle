@@ -1,8 +1,9 @@
 # npm
 node_modules
 
-
 # vim garbage
 .*.sw*
 .*.un~
 
+# generated db dump file
+output.json
