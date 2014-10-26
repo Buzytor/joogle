@@ -25,12 +25,17 @@ var json = JSON.parse(fs.readFileSync(process.argv[3], 'utf-8'));
 
 
 var data = [];
+var visited = [];
 for(func in result) {
   var resultNoErr = result[func].filter(function(elem, pos) {
 	return types.typeToString(elem).indexOf("OMG") == -1;
   });
   var resultNoDup = resultNoErr.filter(function(elem, pos) {
-    return resultNoErr.indexOf(elem) == pos;
+    var typeStr = func + ' ' + types.typeToString(infer.normalizeType(elem));
+	if(visited.indexOf(typeStr) >= 0)
+		return false;
+	visited.push(typeStr);
+	return true;
   });
   resultNoDup.map(function(sig) {
   	var type = types.typeToString(infer.normalizeType(sig));
