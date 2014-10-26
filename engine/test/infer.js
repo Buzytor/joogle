@@ -2,6 +2,7 @@ var types = require('../lib/types');
 var infer = require('../lib/infer');
 var acorn = require('acorn');
 var deepEqual = require('deep-equal');
+var debug = require('../lib/debug');
 
 var ET = infer.ET, C = infer.Constraint, G = types.Generic;
 
@@ -19,13 +20,13 @@ function test(exprStr, desiredResult) {
 	if(!deepEqual(result, desiredResult)) {
 		console.log('Results dont match!');
 		console.log('Root scope:');
-		printScope(rootScope);
+		debug.printScope(rootScope);
 		console.log('------------------');
 		console.log('Input: ' + exprStr);
 		console.log('Desired result:');
-		printETs(desiredResult);
+		debug.printETs(desiredResult);
 		console.log('Actual result:');
-		printETs(result);
+		debug.printETs(result);
 	}
 }
 
@@ -37,23 +38,6 @@ var rootScope = new infer.Scope({
 	'y': [ ET(types.Generic('Y')) ],
 	's': [ ET(types.Obj({ length: types.Number })) ],
 });
-
-function printScope(scope) {
-	Object.keys(scope.vars).forEach(function(key) {
-		scope.vars[key].forEach(function(et) {
-			console.log(key + ' :: ' + types.typeToString(et.type));
-		});
-	});
-}
-
-function printETs(ets) {
-	ets.forEach(function(et) {
-		console.log('Expression type: ' + types.typeToString(et.type));
-		et.constraints.forEach(function(c) {
-			console.log('  ' + c.toString());
-		});
-	});
-}
 
 test(
 	'x',
@@ -96,5 +80,13 @@ test(
 	'function(a) { return a; }',
 	[
 		ET(types.Fn(types.Any, [G('T1')], G('T1'))),
+	]
+);
+
+test(
+	'function(fn, arg, z) { return fn(arg) + z; }',
+	[
+		ET(types.Fn(types.Any, [types.Fn(types.Any, [G('T1')], G('T2')), G('T1'), G('T3')], types.String)),
+		ET(types.Fn(types.Any, [types.Fn(types.Any, [G('T4')], types.Number), G('T4'), types.Number], types.Number)),
 	]
 );

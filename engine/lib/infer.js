@@ -59,13 +59,13 @@ var exprInferrer = {
 			cSet.forEach(function(constraint) {
 				solver.addConstraint(constraint);
 			});
-			var evalReturnType = solver.evaluateType(returnType);
-			console.log('eval(' + types.typeToString(returnType)
-						+ ') = ' + types.typeToString(evalReturnType));
 			var fnType = Fn(Any, paramNames.map(function(name) {
-				return solver.evaluateType(paramTypes[name]);
-			}), evalReturnType);
-			//console.log(JSON.stringify(solver, null, 2));
+				return evalType(paramTypes[name]);
+			}), evalType(returnType));
+			
+			function evalType(t) {
+				return solver.evaluateType(t);
+			}
 
 			return ET(renameGenericTypes(fnType, parentScope));
 		});
@@ -76,7 +76,7 @@ var exprInferrer = {
 		return inferCall(calleeETs, argsETs, scope);
 	},
 	BinaryExpression: function(node, scope, recurse) {
-		var calleeETs = binaryOperatorETs[node.operator];
+		var calleeETs = getBinaryOpETs(node.operator, scope);
 		if(!calleeETs)
 			throw new Error('Unknown operator: ' + node.operator);
 		var argsETs = [ recurse(node.left), recurse(node.right) ];
@@ -142,7 +142,7 @@ var statementInferrer = {
 	},
 	ReturnStatement: function(node, scope, recurse) {
 		var argETs = inferExpression(node.argument, scope);
-		return andConstraints(flatMap(scope.get('return'), function(retET) {
+		return flatMap(scope.get('return'), function(retET) {
 			return argETs.map(function(argET) {
 				return [].concat(
 					argET.constraints,
@@ -150,7 +150,7 @@ var statementInferrer = {
 					[Constraint(retET.type, argET.type)]
 				);
 			});
-		}));
+		});
 	},
 };
 
@@ -177,10 +177,20 @@ function objWithOneProperty(name, valueT) {
 var numberBinaryOpET = ET(Fn(Any, [types.Number, types.Number], types.Number));
 var numberUnaryOpET = ET(Fn(Any, [types.Number], types.Number));
 
+function getBinaryOpETs(operator, scope) {
+	var ret = binaryOperatorETs[operator];
+	if(operator == '+') {
+		ret = ret.map(function(et) {
+			return ET(renameGenericTypes(et.type, scope));
+		});
+	}
+	return ret;
+}
+
 var binaryOperatorETs = {
 	'+': [
+		ET(Fn(Any, [types.Generic('T1'), types.Generic('T2')], types.String)),
 		numberBinaryOpET,
-		ET(Fn(Any, [Any], types.String)),
 	],
 	'-': [ numberBinaryOpET ],
 	'*': [ numberBinaryOpET ],
