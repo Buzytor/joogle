@@ -35,11 +35,6 @@ var getResults = function(query) {
     });
 };
 
-app.use(function(req, res, next){
-	res.db = db;
-	next();
-});
-
 app.get('/', function(req, res) {
     res.render('index', {});
 });
