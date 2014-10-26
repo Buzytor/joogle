@@ -160,8 +160,9 @@ function ConstraintGraph() {
       this.addSimpleConstraint(a.returnType, b.returnType);
       for(var i = 0; i < a.params.length; i++)
         this.addSimpleConstraint(a.params[i], b.params[i]);
-    } else if(a instanceof types.Obj && b instanceof types.Obj && a.mergedWith(b) != 'failed') {
-      this.addSimpleConstraint(a, b);
+    } else if(a instanceof types.Obj && b instanceof types.Obj) {
+      for(attr in a)
+        this.addSimpleConstraint(a.attr, b.attr);
     } else if(!(types.equal(a, b))) {
       console.log('Error matching constraint',
 			  types.typeToString(a) + ' === ' + types.typeToString(b));
