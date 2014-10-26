@@ -47,6 +47,27 @@ var exprInferrer = {
 		var argsETs = node.arguments.map(recurse);
 		return inferCall(calleeETs, argsETs, scope);
 	},
+	BinaryExpression: function(node, scope, recurse) {
+		var calleeETs = binaryOperatorETs[node.operator];
+		if(!calleeETs)
+			throw new Error('Unknown operator: ' + node.operator);
+		var argsETs = [ recurse(node.left), recurse(node.right) ];
+		return inferCall(calleeETs, argsETs, scope);
+	},
+	UnaryExpression: function(node, scope, recurse) {
+		var calleeETs = unaryOperatorETs[node.operator];
+		if(!calleeETs)
+			throw new Error('Unknown operator: ' + node.operator);
+		var argsETs = [ recurse(node.argument) ];
+		return inferCall(calleeETs, argsETs, scope);
+	},
+	UpdateExpression: function(node, scope, recurse) {
+		var calleeETs = unaryOperatorETs[node.operator];
+		if(!calleeETs)
+			throw new Error('Unknown operator: ' + node.operator);
+		var argsETs = [ recurse(node.argument) ];
+		return inferCall(calleeETs, argsETs, scope);
+	},
 	MemberExpression: function(node, scope, recurse) {
 		if(node.computed) {
 			console.warn('Computed member expr not implemented');	
@@ -80,11 +101,25 @@ function objWithOneProperty(name, valueT) {
 	return Obj(properties);
 }
 
-var operatorTypes = {
-	'*': [
-		Fn(Any, [types.Number, types.Number], types.Number)
+var numberBinaryOpET = ET(Fn(Any, [types.Number, types.Number], types.Number));
+var numberUnaryOpET = ET(Fn(Any, [types.Number], types.Number));
+
+var binaryOperatorETs = {
+	'+': [
+		numberBinaryOpET,
+		ET(Fn(Any, [Any], types.String)),
 	],
+	'-': [ numberBinaryOpET ],
+	'*': [ numberBinaryOpET ],
+	'/': [ numberBinaryOpET ],
 	// TODO moar
+};
+
+var unaryOperatorETs = {
+	'-': [ numberUnaryOpET ],
+	'+': [ numberUnaryOpET ],
+	'++': [ numberUnaryOpET ],
+	'--': [ numberUnaryOpET ],
 };
 
 function getLiteralType(value) {
@@ -181,7 +216,7 @@ Constraint.prototype = {
 // ET - "expression type", result of inference
 // type :: Type
 // constraints :: [Constraint]
-var ET = exports.ET = function(type, constraints) {
+function ET(type, constraints) {
 	if(!(this instanceof ET)) return new ET(type, constraints);
 
 	if(type.type && type.constraints) {
@@ -191,7 +226,8 @@ var ET = exports.ET = function(type, constraints) {
 
 	this.type = type;
 	this.constraints = constraints || [];
-};
+}
+exports.ET = ET;
 
 ET.prototype = {
 	toString: function() {

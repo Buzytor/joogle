@@ -34,6 +34,7 @@ var rootScope = new infer.Scope({
 		ET(types.Fn(types.Any, [types.Generic('A')], types.Generic('String'))),
 	],
 	'x': [ ET(types.Generic('X')) ],
+	'y': [ ET(types.Generic('Y')) ],
 	's': [ ET(types.Obj({ length: types.Number })) ],
 });
 
@@ -77,6 +78,16 @@ test(
 		ET(G('T1'), [
 			C(types.Obj({length: types.Number}),
 			  types.Obj({length: G('T1')}))
+		]),
+	]
+);
+
+test(
+	'x * y',
+	[
+		ET(G('T1'), [
+			C(types.Fn(types.Any, [types.Number, types.Number], types.Number),
+			  types.Fn(types.Any, [G('X'), G('Y')], G('T1')))
 		]),
 	]
 );
