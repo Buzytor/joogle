@@ -6,10 +6,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var Promise = require('bluebird');
 
-var mongo = require('mongodb');
-var monk = require('monk');
-var db = monk('localhost:27017/joogle');
-
+var MongoClient = require('mongodb').MongoClient;
 
 var app = express();
 
@@ -26,33 +23,15 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+var dbConnect = MongoClient.connect.bind(MongoClient, 'mongodb://127.0.0.1:27017/joogle');
+
 var getDetails = function(fnName) {
     return new Promise(function(resolve, reject) {
-        resolve({
-            "name": fnName,
-            "signatures": ["(a -> b) -> [a] -> [b]", "(a -> a) -> [a] -> [a]"],
-            "tags": ["alpha", "beta", fnName],
-            "description": fnName + " is a great function",
-            "link": "http://npmjs.org/"
-        });
     });
 };
 
 var getResults = function(query) {
     return new Promise(function(resolve, reject) {
-        resolve( {"results": [
-                    {   "name": "map",
-                        "signature": "(a -> b) -> [a] -> [b]",
-                        "tags": ["alpha", "beta", "gamma", "delta"],
-                        "description": "Map is a function that allows you to map something"
-                    },
-                    {
-                        "name": "reduce",
-                        "signature": "(a -> b -> a) -> a -> [b] -> a",
-                        "tags": ["beta", "delta", "epsilon"],
-                        "description": "Reduce folds your array"
-                    }
-        ]});
     });
 };
 
