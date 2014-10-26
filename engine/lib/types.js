@@ -64,6 +64,13 @@ Generic.prototype = {
 	'!kind': 'Generic',
 };
 
+var kindToPrototype = exports.kindToPrototype = {
+	'Any': {},
+	'Simple': Simple.prototype,
+	'Generic': Generic.prototype,
+	'Function': Fn.prototype,
+	'Obj': Obj.prototype
+};
 
 // Check whether typeA is equal to typeB.
 var equal = exports.equal = function(typeA, typeB) {
