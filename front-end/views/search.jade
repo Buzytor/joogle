@@ -1,19 +1,23 @@
 extends layout
 block content
   include header
-  #search 
+  #search
     #results
       if results
         each result in results
           .result
-            h3
-              a(href="details/" + result.name)
-                span.name= result.name
-                span.type_separator ::
-                span.signature= result.signature
-            p.description= result.description
-            ul.tags
-              each tag in result.tags
-                li= tag
-      else 
+            .declaration
+              h3
+                a(href="details/" + result.name)= result.name
+              ul.signatures
+                each signature in result.signatures
+                  li
+                    a(href="details/" + result.name)= signature
+            if result.description
+              p.description= result.description
+            if result.tags
+              ul.tags
+                each tag in result.tags
+                  li= tag
+      else
           p.description Phrase not found
