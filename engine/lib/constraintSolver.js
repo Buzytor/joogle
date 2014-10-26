@@ -99,12 +99,19 @@ function ConstraintGraph() {
       } else if(kind instanceof types.Obj) {
         if(appliedKind instanceof types.Simple ||
             appliedKind instanceof types.Fn ||
-            appliedKind instanceof types.Arr ||
-            (appliedKind instanceof types.Obj &&
-              (kind.mergedWith(appliedKind) == 'failed')))
+            appliedKind instanceof types.Arr) {
           return 'OMG ERROR';
-        else
-          appliedKind = kind.mergedWith(appliedKind);
+        } else {
+          var newProps = {};
+          for(var attr in kind.properties)
+            newProps[attr] = this.evaluateType(kind.properties[attr]);
+          var newKind = new types.Obj(newProps);
+
+          if(newKind.mergedWith(appliedKind) != 'failed')          
+            appliedKind = newKind.mergedWith(appliedKind);
+          else
+            return 'OMG ERROR';
+        }
       } else if(kind instanceof types.Arr) {
         if(appliedKind instanceof types.Simple ||
             appliedKind instanceof types.Fn ||
@@ -114,7 +121,7 @@ function ConstraintGraph() {
           return 'OMG ERROR';
         else
           appliedKind = kind;
-	  }
+	    }
     }
 
     for(var i = 0; i < kinds.length; i++) {
@@ -134,7 +141,7 @@ function ConstraintGraph() {
       var newProps = {};
       for(var attr in appliedKind.properties)
         newProps[attr] = this.evaluateType(appliedKind.properties[attr]);
-      return new types.Obj(attr);
+      return new types.Obj(newProps);
     } else if(appliedKind instanceof types.Arr) {
       return types.Arr(this.evaluateType(appliedKind.elementType));
     } else {
