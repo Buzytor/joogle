@@ -46,19 +46,32 @@ var exprInferrer = {
 		}
 	},
 	ObjectExpression: function(node, scope, recurse) {
-		var properties = {};
+		var propNames = [];
+		var propTypes = []
 		node.properties.forEach(function(property) {
 			if(property.kind !== 'init') {
 				console.warn('Getters and setters not implemented');
 				return;
 			}
-			properties[keyName(property.key)] = recurse(property.value);
+			propNames.push(keyName(property.key));
+			propTypes.push(recurse(property.value));
 		});
 		// keyName :: (Identifier | Literal) -> String
 		function keyName(key) {
 			return key.name || key.value;
 		}
-		throw new Error('ObjectExpr not implemented');
+		return map(possibleArgumentETs(propTypes), function(propsET) {
+			// propsET : [ET] (one ET for each prop)
+			
+			var props = {};
+			propsET.forEach(function(propET, index) {
+				props[propNames[index]] = propET.type;
+			});
+			return {
+				type: types.Obj(props),
+				constraints: flatMap(propsET, etConstraints)
+			};
+		});
 	},
 	FunctionExpression: function(node, parentScope, recurse) {
 		var paramNames = node.params.map(function(param) { return param.name; });
