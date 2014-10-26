@@ -420,7 +420,7 @@ var renameGenericTypes = exports.renameGenericTypes = function(type, scope) {
 	var _rgt = function(type) {
 		switch(type['!kind']) {
 			case 'Generic':
-				if(cache[type.name] == undefined) {
+				if(!cache[type.name]) {
 					cache[type.name] = scope.newType();
 				}
 				return cache[type.name];
@@ -434,6 +434,8 @@ var renameGenericTypes = exports.renameGenericTypes = function(type, scope) {
 					}
 				}
 				return types.Obj(tmp);
+			case 'Arr':
+				return new types.Arr(_rgt(type.elementType));
 			case 'Any':	case 'Simple': default:
 				return type;
 		}
@@ -473,6 +475,8 @@ var createGenericSignature = exports.createGenericSignature = function(type) {
 					}
 				}
 				return types.Obj(tmp);
+			case 'Arr':
+				return new types.Arr(_rgt(type.elementType));
 			case 'Any':
 				return type;
 		}
