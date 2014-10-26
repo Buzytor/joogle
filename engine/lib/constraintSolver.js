@@ -114,6 +114,7 @@ function ConstraintGraph() {
           return 'OMG ERROR';
         else
           appliedKind = kind;
+	  }
     }
 
     for(var i = 0; i < kinds.length; i++) {
