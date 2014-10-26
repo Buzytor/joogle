@@ -4,11 +4,14 @@ var types = require('./types');
 var ConstraintSolver = require('./constraintSolver').solver;
 
 var Fn = types.Fn, Obj = types.Obj, Any = types.Any;
+var debug = require('./debug');
 
 var walkRecursive = exports.walkRecursive =
 		function(visitor, node, state) {
 			function recurse(node) {
-				return visitor[node.type](node, state, recurse);
+				var ret = visitor[node.type](node, state, recurse);
+				console.log(node.type, ret);
+				return ret;
 			}
 			return recurse(node);
 		};
@@ -71,6 +74,8 @@ var exprInferrer = {
 		var returnType = scope.newType();
 		scope.set('return', [ ET(returnType) ]);
 		var constraintSets = inferStatement(node.body, scope);
+		debug.printScope(scope);
+		constraintSets.forEach(function(set) { debug.printCSet(set); });
 		return constraintSets.map(function(cSet) {
 			var solver = new ConstraintSolver();
 			cSet.forEach(function(constraint) {
@@ -83,6 +88,7 @@ var exprInferrer = {
 			function evalType(t) {
 				return solver.evaluateType(t);
 			}
+			console.log(fnType);
 
 			return ET(renameGenericTypes(fnType, parentScope));
 		});
@@ -138,6 +144,22 @@ var exprInferrer = {
 	Literal: function(node, scope) {
 		return [ ET(getLiteralType(node.value)) ];
 	},
+	AssignmentExpression: function(node, scope, recurse) {
+		var lhsETs = recurse(node.left);
+		var rhsETs = recurse(node.right);
+		return flatMap(lhsETs, function(lhsET) {
+			return flatMap(rhsETs, function(rhsET) {
+				return debug.printET(ET({
+					type: rhsET.type,
+					constraints: [].concat(
+						lhsET.constraints,
+						rhsET.constraints,
+						Constraint(lhsET.type, rhsET.type)
+					)
+				}));
+			});
+		});
+	},
 };
 
 var inferStatement = function(node, scope) {
@@ -147,6 +169,10 @@ var inferStatement = function(node, scope) {
 var statementInferrer = {
 	ExpressionStatement: function(node, scope, recurse) {
 		return inferExpression(node.expression, scope).map(etConstraints);
+	},
+	Program: function(node, scope, recurse) {
+		// Not really a Statement, but works like a block.
+		return andConstraints(node.body.map(recurse));
 	},
 	BlockStatement: function(node, scope, recurse) {
 		return andConstraints(node.body.map(recurse));
@@ -169,6 +195,20 @@ var statementInferrer = {
 			});
 		});
 	},
+};
+
+var inferModule = exports.inferModule = function(node) {
+	var scope = new Scope();
+	var exportsType = scope.newType();
+	scope.set('module', [ ET(types.Obj({ exports: exportsType })) ]);
+	var cSets = inferStatement(node, scope);
+	return cSets.map(function(cSet) {
+		var solver = new ConstraintSolver();
+		cSet.forEach(function(constraint) {
+			solver.addConstraint(constraint);
+		});
+		return solver.evaluateType(exportsType);
+	});	
 };
 
 // [[[Constraints]]] -> [[Constraints]]

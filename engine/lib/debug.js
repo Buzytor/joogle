@@ -2,6 +2,7 @@ var types = require('./types');
 
 exports.printETs = function(ets) {
 	ets.forEach(exports.printET);
+	return ets;
 };
 
 exports.printET = function(et) {
@@ -9,6 +10,7 @@ exports.printET = function(et) {
 	et.constraints.forEach(function(c) {
 		console.log('  ' + c.toString());
 	});
+	return et;
 };
 
 exports.printScope = function(scope) {

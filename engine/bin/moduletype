@@ -1,0 +1,14 @@
+#!/usr/bin/env node
+
+var infer = require('../lib/infer');
+var types = require('../lib/types');
+var acorn = require('acorn');
+var fs = require('fs');
+
+var program = acorn.parse(fs.readFileSync(process.argv[2], 'utf-8'));
+
+var ts = infer.inferModule(program);
+
+ts.forEach(function(type) {
+	console.log(types.typeToString(type));
+});
