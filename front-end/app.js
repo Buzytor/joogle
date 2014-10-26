@@ -5,6 +5,7 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var Promise = require('bluebird');
+var parser = require('../engine/lib/parser');
 
 var MongoClient = require('mongodb').MongoClient;
 
@@ -27,12 +28,14 @@ var dbConnect = MongoClient.connect.bind(MongoClient, 'mongodb://127.0.0.1:27017
 
 var getDetails = function(fnName) {
     return new Promise(function(resolve, reject) {
+		resolve({});
     });
 };
 
 var getResults = function(query) {
     return new Promise(function(resolve, reject) {
-    });
+		resolve({}); 
+	});
 };
 
 app.get('/', function(req, res) {
@@ -42,11 +45,15 @@ app.get('/', function(req, res) {
 app.get('/search', function(req, res) {
     //TODO Add db integration
 	var query = req.query.q;
-    getResults(query).then(function(obj) {
-        var results = obj.results;
-        res.render('search', {"results": results, "title": query+" :: Search results :: "});
-    });
-
+	if(query) {
+		var parsedQuery = parser(query, '../engine/lib/parser.pegjs');
+		getResults(query).then(function(obj) {
+			var results = obj.results;
+			res.render('search', {"results": results, "title": query+" :: Search results :: "});
+		});
+	}
+	else
+		res.render('index', {});
 });
 
 app.get('/details/:name', function(req, res) {
