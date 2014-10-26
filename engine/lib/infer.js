@@ -22,7 +22,24 @@ var exprInferrer = {
 		return scope.get('this');
 	},
 	ArrayExpression: function(node, scope, recurse) {
-		throw new Error('Array not implemented');
+		if(!node.elements) {
+			return [ ET(types.Arr(scope.newType())) ];
+		} else {
+			var argsETs = node.elements.map(recurse);
+			return map(possibleArgumentETs(argsETs), function(argsET) {
+				var elementType = scope.newType();
+				var et = ET({
+					type: types.Arr(elementType),
+					constraints: [].concat(
+						flatMap(argsET, etConstraints),
+						argsET.reduce(function(acc, argET) {
+							return acc.concat([Constraint(argET.type, elementType)]);
+						}, [])
+					)
+				});
+				return et;
+			});
+		}
 	},
 	ObjectExpression: function(node, scope, recurse) {
 		var properties = {};

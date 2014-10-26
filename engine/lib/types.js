@@ -53,6 +53,16 @@ Obj.prototype = {
   }
 };
 
+// A homogenous array with elements of given type.
+// @param elementType {Type}
+var Arr = exports.Arr = function(elementType) {
+	if(!(this instanceof Arr)) return new Arr(elementType);
+	this.elementType = elementType;
+};
+Arr.prototype = {
+	'!kind': 'Arr',
+};
+
 // A function.
 // @param selfType {Object} - the type of 'this'.
 //	 There are functions that don't need this, so it can be Any.
@@ -82,7 +92,8 @@ var kindToPrototype = exports.kindToPrototype = {
 	'Simple': Simple.prototype,
 	'Generic': Generic.prototype,
 	'Function': Fn.prototype,
-	'Obj': Obj.prototype
+	'Obj': Obj.prototype,
+	'Arr': Arr.prototype,
 };
 
 // Check whether typeA is equal to typeB.
@@ -104,6 +115,8 @@ var typeToString = exports.typeToString = function(type) {
 			var keys = Object.getOwnPropertyNames(props);
 			var strs = keys.map(function(k){ return k+": "+typeToString(props[k]); });
 			return "{" + strs.join(", ") + "}";
+		case 'Arr':
+			return '[' + typeToString(type.elementType) + ']';
 		default:
 			return "ERROR: "+type;
 	}

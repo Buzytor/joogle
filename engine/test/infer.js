@@ -90,3 +90,10 @@ test(
 		ET(types.Fn(types.Any, [types.Fn(types.Any, [G('T4')], types.Number), G('T4'), types.Number], types.Number)),
 	]
 );
+
+test(
+	'[x]',
+	[
+		ET(types.Arr(types.Generic('X'))),
+	]
+);
