@@ -9,9 +9,7 @@ var debug = require('./debug');
 var walkRecursive = exports.walkRecursive =
 		function(visitor, node, state) {
 			function recurse(node) {
-				//console.log('enter' + node.type);
 				var ret = visitor[node.type](node, state, recurse);
-				//console.log(node.type, ret);
 				return ret;
 			}
 			return recurse(node);
@@ -88,8 +86,6 @@ var exprInferrer = {
 		var returnType = scope.newType();
 		scope.set('return', [ ET(returnType) ]);
 		var constraintSets = inferStatement(node.body, scope);
-		debug.printScope(scope);
-		constraintSets.forEach(function(set) { debug.printCSet(set); });
 		return constraintSets.map(function(cSet) {
 			var solver = new ConstraintSolver();
 			cSet.forEach(function(constraint) {
@@ -102,7 +98,6 @@ var exprInferrer = {
 			function evalType(t) {
 				return solver.evaluateType(t);
 			}
-			console.log('fnType', types.typeToString(fnType));
 
 			return ET(renameGenericTypes(fnType, parentScope));
 		});
@@ -140,8 +135,7 @@ var exprInferrer = {
 			var propETs = recurse(node.property);
 			return flatMap(objectETs, function(objectET) {
 				return flatMap(propETs, function(propET) {
-					console.log('ARRAI MEMBER');
-					return debug.printET(ET({
+					return ET({
 						type: resultType,
 						constraints: [].concat(
 							objectET.constraints,
@@ -149,7 +143,7 @@ var exprInferrer = {
 							Constraint(objectET.type, types.Arr(resultType)),
 							Constraint(propET.type, types.Number)
 						)
-					}));
+					});
 				});
 			});
 		} else {
@@ -255,7 +249,6 @@ var inferModule = exports.inferModule = function(node) {
 	scope.set('module', [ ET(types.Obj({ exports: exportsType })) ]);
 	var cSets = inferStatement(node, scope);
 	return cSets.map(function(cSet) {
-		debug.printCSet(cSet);
 		var solver = new ConstraintSolver();
 		cSet.forEach(function(constraint) {
 			solver.addConstraint(constraint);
