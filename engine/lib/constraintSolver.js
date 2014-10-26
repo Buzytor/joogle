@@ -49,7 +49,7 @@ function ConstraintGraph() {
     var kindId = this.findNode(kind);
 
     if(kindId == -1)
-      return types.Any;
+      return kind;
 
     if(this.nodes[kindId].resultKind)
       return this.nodes[kindId].resultKind;
@@ -77,7 +77,7 @@ function ConstraintGraph() {
           !(appliedKind instanceof types.Simple) &&
           !(appliedKind instanceof types.Fn) &&
           !(appliedKind instanceof types.Obj)) {
-        appliedKind = kind;
+        //appliedKind = kind;
       } else if(kind instanceof types.Simple) {
         if(appliedKind instanceof types.Fn ||
             appliedKind instanceof types.Obj ||
@@ -146,7 +146,9 @@ console.log(graph.evaluateType(types.Obj({'test1': types.Any})));
 */
 /*
 graph.addConstraint(types.Generic('A'), types.Fn(types.Number, [types.Number], types.Number));
-graph.addConstraint(types.Generic('C'), types.Fn(types.Number, [types.Number], types.String));
+*/
+//console.log(JSON.stringify(types.Fn(types.Any, [types.Number], types.String), null, 2));
+/*
 graph.addConstraint(types.Generic('E'), types.Generic('D'));
 console.log(graph.evaluateType(types.Generic('A')));
 console.log(graph.evaluateType(types.Generic('E')));
