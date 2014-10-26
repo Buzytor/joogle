@@ -84,7 +84,7 @@ function ConstraintGraph() {
             appliedKind instanceof types.Arr ||
             (appliedKind instanceof types.Simple &&
               !(types.equal(kind, appliedKind))))
-          return 'OMG ERROR';
+          return omgError(kind, appliedKind);
         else
           appliedKind = kind;
       } else if(kind instanceof types.Fn) {
@@ -93,14 +93,18 @@ function ConstraintGraph() {
             appliedKind instanceof types.Arr ||
             (appliedKind instanceof types.Fn &&
               !(types.equal(kind, appliedKind))))
-          return 'OMG ERROR';
+          return omgError(kind, appliedKind);
         else
           appliedKind = kind;
+	} else if(kind instanceof types.Obj && appliedKind instanceof types.Arr) {
+		return appliedKind;
+	} else if(appliedKind instanceof types.Obj && kind instanceof types.Arr) {
+		return kind;
       } else if(kind instanceof types.Obj) {
         if(appliedKind instanceof types.Simple ||
             appliedKind instanceof types.Fn ||
             appliedKind instanceof types.Arr) {
-          return 'OMG ERROR';
+          return omgError(kind, appliedKind);
         } else {
           var newProps = {};
           for(var attr in kind.properties)
@@ -110,7 +114,7 @@ function ConstraintGraph() {
           if(newKind.mergedWith(appliedKind) != 'failed')          
             appliedKind = newKind.mergedWith(appliedKind);
           else
-            return 'OMG ERROR';
+          return omgError(kind, appliedKind);
         }
       } else if(kind instanceof types.Arr) {
         if(appliedKind instanceof types.Simple ||
@@ -118,7 +122,7 @@ function ConstraintGraph() {
             appliedKind instanceof types.Obj ||
             (appliedKind instanceof types.Arr &&
               !(types.equal(kind, appliedKind))))
-          return 'OMG ERROR';
+          return omgError(kind, appliedKind);
         else
           appliedKind = kind;
 	    }
@@ -149,9 +153,15 @@ function ConstraintGraph() {
     }
   };
 
+  function omgError(a, b) {
+    a = ('OMG ERROR [' + types.typeToString(a) + ' <> ' + types.typeToString(b) + ']');
+	return a;
+  }
+
   this.addConstraint = function(constraint) {
     var a = constraint.a;
     var b = constraint.b;
+	//console.log('addConstraint ', types.typeToString(a), '===', types.typeToString(b));
     if(a instanceof types.Generic || b instanceof types.Generic)
       this.addSimpleConstraint(a, b);
     else if(a instanceof types.Fn && b instanceof types.Fn &&
