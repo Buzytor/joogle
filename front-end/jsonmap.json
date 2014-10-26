@@ -1,0 +1,15 @@
+{
+	"moreStuff": {"desc": "Does complex math calculations", "link": "http://buzytor.com/", "tags": ["buzytor", "buoto"]},
+	"someStuff": {"desc": "Does some stuff", "link": "http://buzytor.com/", "tags": ["buzytor", "buoto"]},
+	"lengths": {"desc": "Maps subarrays to their lengths", "link": "http://buzytor.com/", "tags": ["buzytor", "buoto"]},
+	"fill": {"desc": "Fills array with value", "link": "http://buzytor.com/", "tags": ["buzytor", "buoto"]},
+	"addArrayStrange": {"desc": "Strange stuff",  "link": "http://buzytor.com/", "tags": ["buzytor", "buoto"]},
+	"addArray": {"desc": "Adds two arrays",  "link": "http://buzytor.com/", "tags": ["buzytor", "buoto"]},
+	"addLength": {"desc": "Add lengths of two arrays",  "link": "http://buzytor.com/", "tags": ["buzytor", "buoto"]},
+	"add": {"desc": "Adds two values",  "link": "http://buzytor.com/", "tags": ["buzytor", "buoto"]},
+	"map": {"desc": "Create an array with values made by applying function to each element of the source array",  "link": "http://buzytor.com/", "tags": ["buzytor", "buoto"]},
+	"run": {"desc": "Run function",  "link": "http://buzytor.com/", "tags": ["buzytor", "buoto"]},
+	"last": {"desc": "Returns last element",  "link": "http://buzytor.com/", "tags": ["buzytor", "buoto"]},
+	"first": {"desc": "Returns first element",  "link": "http://buzytor.com/", "tags": ["buzytor", "buoto"]},
+	"mutliply": {"desc": "Multiplies two numbers",  "link": "http://buzytor.com/", "tags": ["buzytor", "buoto"]}
+}

@@ -33,6 +33,10 @@ var parseInput = function(query) {
     return parser(query, '../engine/lib/parser.pegjs');
 };
 
+var makeNonGenericSignature = function(sig) {
+    return infer.renameGenericTypes(sig, new infer.normalizerScope());
+};
+
 var makeGenericSignature = function(sig) {
     return infer.createGenericSignature(sig);
 };
@@ -78,9 +82,10 @@ var getResults = function(query) {
 	    dbConnect(function(err, db){
 		if(err) { throw err; }
 		var parsedInput = parseInput(query);
+		var nonGenericSignature = types.typeToString(makeNonGenericSignature(parsedInput));
 		var genericSignature = types.typeToString(makeGenericSignature(parsedInput));
 		var signatures = db.collection('signatures');
-		signatures.find({"genericSignature": genericSignature}).toArray(function(err, results) {
+		signatures.find({"genericSignature": { $in: [genericSignature, nonGenericSignature]}}).toArray(function(err, results) {
 		    if(err) { throw err; }
 		    db.close();
 		    console.log(results);

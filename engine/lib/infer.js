@@ -98,7 +98,6 @@ var exprInferrer = {
 			function evalType(t) {
 				return solver.evaluateType(t);
 			}
-
 			return ET(renameGenericTypes(fnType, parentScope));
 		});
 	},
@@ -494,7 +493,7 @@ var renameGenericTypes = exports.renameGenericTypes = function(type, scope) {
 	return _rgt(type);
 };
 
-var normalizerScope = function() {
+var normalizerScope = exports.normalizerScope = function() {
 	this.counter = 65;
 	this.newType = function() {
 		return types.Generic(String.fromCharCode(this.counter++));
