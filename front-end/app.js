@@ -6,6 +6,9 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var Promise = require('bluebird');
 var parser = require('../engine/lib/parser');
+var infer = require('../engine/lib/infer');
+var constraintSolver = require('../engine/lib/constraintSolver');
+var types = require('../engine/lib/types');
 
 var MongoClient = require('mongodb').MongoClient;
 
@@ -26,16 +29,72 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 var dbConnect = MongoClient.connect.bind(MongoClient, 'mongodb://127.0.0.1:27017/joogle');
 
+var parseInput = function(query) {
+    return parser(query, '../engine/lib/parser.pegjs');
+};
+
+var makeGenericSignature = function(sig) {
+    return infer.createGenericSignature(sig);
+};
+
+var selectValidResults = function(inputSignature, results) {
+    var inputConstraint = infer.Constraint(new types.Generic('XXX'), inputSignature);
+    return results.filter(function(func) {
+	var sigs = func.signatures.filter(function(sig) {
+	    var solver = new constraintSolver.solver();
+	    var secondConstraint = infer.Constraint(new types.Generic('XXX'), sig);
+	    solver.addConstraint(inputConstraint);
+	    solver.addConstraint(secondConstraint);
+	    var result = solver.evaluateType(new types.Generic('XXX'));
+	    console.log(result);
+	    return result != "OMG ERROR";
+	});
+	console.log(sigs.length);
+	return sigs.length != 0;
+    });
+};
+
 var getDetails = function(fnName) {
     return new Promise(function(resolve, reject) {
-		resolve({});
+	try {
+	    dbConnect(function(err, db){
+		if(err) { throw err; }
+		db.signatures.find({"name": fnName}).toArray(function(err, results) {
+		    if(err) { throw err; }
+		    db.close();
+		    resolve(results);
+		});
+	    });
+	} catch(e) {
+	    reject(e);
+	}
     });
 };
 
 var getResults = function(query) {
     return new Promise(function(resolve, reject) {
-		resolve({}); 
-	});
+	try {
+	    dbConnect(function(err, db){
+		if(err) { throw err; }
+		var parsedInput = parseInput(query);
+		var genericSignature = types.typeToString(makeGenericSignature(parsedInput));
+		var signatures = db.collection('signatures');
+		signatures.find({"genericSignature": genericSignature}).toArray(function(err, results) {
+		    if(err) { throw err; }
+		    db.close();
+		    console.log(results);
+		    var r = [];
+		    if(results) {
+			r = selectValidResults(parsedInput, results);
+		    }
+		    console.log(r);
+		    resolve(r);
+		});
+	    });
+	} catch(e) {
+	    reject(e);
+	}
+    });
 };
 
 app.get('/', function(req, res) {
@@ -43,23 +102,21 @@ app.get('/', function(req, res) {
 });
 
 app.get('/search', function(req, res) {
-    //TODO Add db integration
-	var query = req.query.q;
-	if(query) {
-		var parsedQuery = parser(query, '../engine/lib/parser.pegjs');
-		getResults(query).then(function(obj) {
-			var results = obj.results;
-			res.render('search', {"results": results, "title": query+" :: Search results :: "});
-		});
-	}
-	else
-		res.render('index', {});
+    var query = req.query.q;
+    getResults(query).then(function(obj) {
+        var results = obj;
+        res.render('search', {"results": results, "title": query+" :: Search results :: "});
+    }).catch(function(err) {
+	res.status(500).send("DB error: "+err);
+    });
 });
 
 app.get('/details/:name', function(req, res) {
     var name = req.params.name;
     getDetails(name).then(function(obj) {
         res.render('details', {"details": obj, "title": name+" :: "});
+    }).catch(function(err) {
+	res.status(500).send("DB error: "+err);
     });
 });
 
