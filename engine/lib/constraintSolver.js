@@ -171,9 +171,11 @@ function ConstraintGraph() {
       for(var i = 0; i < a.params.length; i++)
         this.addSimpleConstraint(a.params[i], b.params[i]);
     } else if(a instanceof types.Obj && b instanceof types.Obj) {
-      for(attr in a.properties) {
+      for(var attr in a.properties) {
         this.addSimpleConstraint(a.properties[attr], b.properties[attr]);
 	  }
+	} else if(a instanceof types.Arr && b instanceof types.Arr) {
+		this.addConstraint(a.elementType, b.elementType);
 	} else if(b instanceof types.Obj && a instanceof types.Arr) {
 		this.matchArrayObj(a, b);
 	} else if(a instanceof types.Obj && b instanceof types.Arr) {
