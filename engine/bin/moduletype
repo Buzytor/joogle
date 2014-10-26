@@ -9,6 +9,23 @@ var program = acorn.parse(fs.readFileSync(process.argv[2], 'utf-8'));
 
 var ts = infer.inferModule(program);
 
+var result = { };
+
 ts.forEach(function(type) {
-	console.log(types.typeToString(type));
+  for(prop in type.properties) {
+    if(result[prop] === undefined)
+      result[prop] = [ ];
+    result[prop].push(type.properties[prop]);
+  }
 });
+
+for(func in result) {
+  var resultNoDup = result[func].filter(function(elem, pos) {
+    return result[func].indexOf(elem) == pos;
+  })
+  resultNoDup.forEach(function(sig) {
+    console.log(func, '::', types.typeToString(infer.normalizeType(sig)));
+  });
+}
+
+
