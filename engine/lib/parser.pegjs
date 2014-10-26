@@ -11,8 +11,10 @@ typeList
  
 type
  = objectType
+ / arrType
  / functionType
  / simpleType
+
 space 
  = " " *
 
@@ -52,8 +54,12 @@ objectType
 	  })    
 	  return {'!kind': 'Obj', properties: properties }; }
 
+arrType
+ = "[" space elementType:type space "]" { return {'!kind': 'Arr', elementType: elementType};}
+
+
 property
   = name:propertyName space val:type space "," * space {return [name, val];}
 
 propertyName
-  = name:simpleName ":" {return name;}
+  = name:simpleName ":" { return name; }
