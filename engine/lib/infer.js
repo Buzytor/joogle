@@ -384,14 +384,41 @@ var renameGenericTypes = exports.renameGenericTypes = function(type, scope) {
 	return _rgt(type);
 };
 
+var normalizerScope = function() {
+	this.counter = 65;
+	this.newType = function() {
+		return types.Generic(String.fromCharCode(this.counter++));
+	};
+};
 
 var normalizeType = exports.normalizeType = function(type) {
-	var scope = {
-		counter: 65,
-		newType: function() {
-			return types.Generic(String.fromCharCode(this.counter++));
-		}
-	};
+	var scope = new normalizerScope();
 	return renameGenericTypes(type, scope);
 };
 
+var createGenericSignature = exports.createGenericSignature = function(type) {
+	var scope = new normalizerScope();
+	var cache = {};
+	var _rgt = function(type) {
+		switch(type['!kind']) {
+			case 'Generic': case 'Simple':
+				if(cache[type.name] == undefined) {
+					cache[type.name] = scope.newType();
+				}
+				return cache[type.name];
+			case 'Function':
+				return new Fn(_rgt(type.selfType), type.params.map(_rgt), _rgt(type.returnType));
+			case 'Obj':
+				var tmp = {};
+				for(var k in type.properties) {
+					if(type.properties.hasOwnProperty(k)) {
+						tmp[k] = _rgt(type.properties[k]);
+					}
+				}
+				return types.Obj(tmp);
+			case 'Any':
+				return type;
+		}
+	};
+	return _rgt(type);
+};
