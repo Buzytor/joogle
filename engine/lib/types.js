@@ -91,6 +91,7 @@ var equal = exports.equal = function(typeA, typeB) {
 };
 
 var typeToString = exports.typeToString = function(type) {
+	if(!type) return String(type);
 	switch(type['!kind']) {
 		case 'Any':
 			return 'Any';
