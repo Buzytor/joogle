@@ -9,6 +9,7 @@ var debug = require('./debug');
 var walkRecursive = exports.walkRecursive =
 		function(visitor, node, state) {
 			function recurse(node) {
+				//console.log('enter' + node.type);
 				var ret = visitor[node.type](node, state, recurse);
 				//console.log(node.type, ret);
 				return ret;
@@ -222,7 +223,11 @@ var statementInferrer = {
 		return valETs.map(etConstraints);
 	},
 	ForStatement: function(node, scope, recurse) {
-		var initCSs = node.init? recurse(node.init): [[]];
+		var initCSs = node.init?
+			node.init.type === 'VariableDeclaration'?
+				recurse(node.init):
+				inferExpression(node.init, scope).map(etConstraints):
+			[[]];
 		var testCSs = node.test? inferExpression(node.test, scope).map(etConstraints): [[]];
 		var updateCSs = node.update? inferExpression(node.update, scope).map(etConstraints): [[]];
 		var bodyCSs = recurse(node.body);

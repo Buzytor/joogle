@@ -3,7 +3,7 @@ var run = module.exports.run = function(fun, sth) {
 };
 module.exports.map = function(fun, arr) {
 	var ar = [];
-	for(i = 0; i < arr.length; i++) {
+	for(var i = 0; i < arr.length; i++) {
 		ar[i]= run(fun, arr[i]);
 	}
 	return ar;
@@ -17,7 +17,7 @@ module.exports.addLength = function(a, b) {
 };
 
 module.exports.addArray = function(a, b) {
-	for(i = 0; i < a.length; i ++) {
+	for(var i = 0; i < a.length; i ++) {
 		a[i] += b[i];
 	}
 	return a;
