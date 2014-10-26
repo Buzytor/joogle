@@ -75,10 +75,12 @@ function ConstraintGraph() {
         appliedKind = kind;
       } else if(types.equal(kind, types.Any) &&
           !(appliedKind instanceof types.Simple) &&
-          !(appliedKind instanceof types.Fn)) {
+          !(appliedKind instanceof types.Fn) &&
+          !(appliedKind instanceof types.Obj)) {
         appliedKind = kind;
       } else if(kind instanceof types.Simple) {
         if(appliedKind instanceof types.Fn ||
+            appliedKind instanceof types.Obj ||
             (appliedKind instanceof types.Simple &&
               !(types.equal(kind, appliedKind))))
           return 'OMG ERROR';
@@ -86,13 +88,21 @@ function ConstraintGraph() {
           appliedKind = kind;
       } else if(kind instanceof types.Fn) {
         if(appliedKind instanceof types.Simple ||
+            appliedKind instanceof types.Obj ||
             (appliedKind instanceof types.Fn &&
               !(types.equal(kind, appliedKind))))
           return 'OMG ERROR';
         else
           appliedKind = kind;
-      } 
-
+      } else if(kind instanceof types.Obj) {
+        if(appliedKind instanceof types.Simple ||
+            appliedKind instanceof types.Fn ||
+            (appliedKind instanceof types.Obj &&
+              (kind.mergedWith(appliedKind) == 'failed')))
+          return 'OMG ERROR';
+        else
+          appliedKind = kind.mergedWith(appliedKind);
+      }
     }
 
     for(var i = 0; i < kinds.length; i++) {
@@ -116,6 +126,8 @@ function ConstraintGraph() {
       this.addSimpleConstraint(a.returnType, b.returnType);
       for(var i = 0; i < a.params.length; i++)
         this.addSimpleConstraint(a.params[i], b.params[i]);
+    } else if(a instanceof types.Obj && b instanceof types.Obj && a.mergedWith(b) != 'failed') {
+      this.addSimpleConstraint(a, b);
     } else if(!(types.equal(a, b))) {
       console.log('Error matching constraint', a, b);
     }
@@ -125,11 +137,12 @@ function ConstraintGraph() {
 exports.solver = ConstraintGraph;
 
 /*
-var constraint1 = infer.Constraint(types.Fn(types.Any, [types.Generic('A')], types.String), types.Fn(types.Any, [types.Generic('X')], types.Generic('T1')));
+var constraint1 = infer.Constraint(types.Obj({'test1': types.Any}), types.Obj({'test2': types.Number}));
 
 var graph = new exports.solver();
 graph.addConstraint(constraint1);
-console.log(graph.evaluateType(types.Generic('A')));
+graph.dumpAll();
+console.log(graph.evaluateType(types.Obj({'test1': types.Any})));
 */
 /*
 graph.addConstraint(types.Generic('A'), types.Fn(types.Number, [types.Number], types.Number));

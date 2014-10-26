@@ -38,6 +38,19 @@ var Obj = exports.Obj = function(properties) {
 };
 Obj.prototype = {
 	'!kind': 'Obj',
+  mergedWith: function(obj) {
+    var result = Obj();
+    for(attr in this.properties)
+      result.properties[attr] = this.properties[attr];
+    for(attr in obj.properties) {
+      if(result.properties[attr] === undefined)
+        result.properties[attr] = obj.properties[attr];
+      else if(!(equal(result.properties[attr], obj.properties[attr]))) {
+        return 'failed';
+      }
+    }
+    return result;
+  }
 };
 
 // A function.
