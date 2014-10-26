@@ -17,7 +17,31 @@ space
  = " " *
 
 simpleType
+  = name:simpleName {
+	  var type = 'Generic';
+	  switch(name){
+		  case 'Number': 
+			type = 'Simple';
+			break;
+		  case 'Boolean': 
+			type = 'Simple';
+			break;
+		  case 'Array': 
+			type = 'Simple';
+			break;
+		  case 'RegExp': 
+			type = 'Simple';
+			break;
+		  case 'String': 
+			type = 'Simple';
+			break;
+		  }
+	  return {'!kind': type, name: name};
+	  }
+
+simpleName
   = firstChar: [a-zA-z] rest: [a-zA-Z0-9]* {return firstChar + rest.join("");}
+
 
 
 objectType
@@ -32,4 +56,4 @@ property
   = name:propertyName space val:type space "," * space {return [name, val];}
 
 propertyName
-  = name:simpleType ":" {return name;}
+  = name:simpleName ":" {return name;}
