@@ -221,6 +221,14 @@ var statementInferrer = {
 		scope.set(node.id.name, valETs);
 		return valETs.map(etConstraints);
 	},
+	ForStatement: function(node, scope, recurse) {
+		var initCSs = node.init? recurse(node.init): [[]];
+		var testCSs = node.test? inferExpression(node.test, scope).map(etConstraints): [[]];
+		var updateCSs = node.update? inferExpression(node.update, scope).map(etConstraints): [[]];
+		var bodyCSs = recurse(node.body);
+
+		return andConstraints([ initCSs, testCSs, updateCSs, bodyCSs ]);
+	},
 };
 
 var inferModule = exports.inferModule = function(node) {
@@ -260,6 +268,7 @@ function objWithOneProperty(name, valueT) {
 
 var numberBinaryOpET = ET(Fn(Any, [types.Number, types.Number], types.Number));
 var numberUnaryOpET = ET(Fn(Any, [types.Number], types.Number));
+var numberBinPredET = ET(Fn(Any, [types.Number, types.Number], types.Boolean));
 
 function getBinaryOpETs(operator, scope) {
 	var ret = binaryOperatorETs[operator];
@@ -279,6 +288,10 @@ var binaryOperatorETs = {
 	'-': [ numberBinaryOpET ],
 	'*': [ numberBinaryOpET ],
 	'/': [ numberBinaryOpET ],
+	'<': [ numberBinPredET ],
+	'<=': [ numberBinPredET ],
+	'>': [ numberBinPredET ],
+	'=>': [ numberBinPredET ],
 	// TODO moar
 };
 
