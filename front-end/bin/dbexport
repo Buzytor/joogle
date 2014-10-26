@@ -1,0 +1,47 @@
+#!/usr/bin/env node
+
+var infer = require('../../engine/lib/infer');
+var types = require('../../engine/lib/types');
+var acorn = require('../../engine/node_modules/acorn');
+var fs = require('fs');
+var MongoClient = require('mongodb').MongoClient;
+var dbConnect = MongoClient.connect.bind(MongoClient, 'mongodb://127.0.0.1:27017/joogle');
+
+var program = acorn.parse(fs.readFileSync(process.argv[2], 'utf-8'));
+
+var ts = infer.inferModule(program);
+
+var result = { };
+
+ts.forEach(function(type) {
+  for(prop in type.properties) {
+    if(result[prop] === undefined)
+      result[prop] = [ ];
+    result[prop].push(type.properties[prop]);
+  }
+});
+
+var json = JSON.parse(fs.readFileSync(process.argv[3], 'utf-8'));
+
+
+var data = [];
+for(func in result) {
+  var resultNoErr = result[func].filter(function(elem, pos) {
+	return types.typeToString(elem).indexOf("OMG") == -1;
+  });
+  var resultNoDup = resultNoErr.filter(function(elem, pos) {
+    return resultNoErr.indexOf(elem) == pos;
+  });
+  resultNoDup.map(function(sig) {
+  	var type = types.typeToString(infer.normalizeType(sig));
+	data.push({"name": func,
+			"genericSignature": type,
+			"description": json[func].desc,
+			"tags": json[func].tags,
+			"signatures": [type],
+			"link": json[func].link
+		});
+	});
+}
+fs.writeFileSync('output.json', JSON.stringify(data));
+
