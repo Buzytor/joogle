@@ -120,9 +120,8 @@ function ConstraintGraph() {
     } else if(appliedKind instanceof types.Obj) {
       for(attr in appliedKind.properties)
         appliedKind.properties[attr] = this.evaluateType(appliedKind.properties[attr]);
-    } else {
-      return appliedKind;
     }
+    return appliedKind;
   }
 
   this.addConstraint = function(constraint) {
