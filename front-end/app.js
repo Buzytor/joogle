@@ -82,46 +82,45 @@ var getDetails = function(fnName) {
 };
 
 var getResults = function(rawInput) {
-    var parsedInput = parser.parseString(rawInput);
-    var nonGenericSignature = types.typeToString(makeNonGenericSignature(parsedInput));
-    var genericSignature = types.typeToString(makeGenericSignature(parsedInput));
-    var nonGenericSignatureRegex = createRegexFromInput(nonGenericSignature);
-    var genericSignatureRegex = createRegexFromInput(genericSignature);
     return new Promise(function(resolve, reject) {
-        try {
-            dbConnect(function(err, db){
-                if(err) { throw err; }
-                var signatures = db.collection('signatures');
-                var qw = {"$or": [
-                    {"genericSignature": {"$regex": genericSignatureRegex}},
-                    {"genericSignature": {"$regex": nonGenericSignatureRegex}}
-                ]};
-                signatures.find(qw).toArray(function(err, results) {
-                    if(err) { throw err; }
-                    db.close();
-                    var r = [];
-                    if(results) {
-                        r = selectValidResults(parsedInput, results);
-                    }
-                    resolve(r);
-                });
-            });
-        } catch(e) {
-            console.log(e);
-            switch(e.name) {
-                case 'SyntaxError':
-                    resolve('');
-                    break;
-                case 'EmptyQueryError':
-                    resolve('');
-                    break;
-                case 'ParseError':
-                    resolve('')
-                        break;
-                default:
-                    reject(e);
-           }
-        }
+	try {
+	    var parsedInput = parser.parseString(rawInput);
+	    var nonGenericSignature = types.typeToString(makeNonGenericSignature(parsedInput));
+	    var genericSignature = types.typeToString(makeGenericSignature(parsedInput));
+	    var nonGenericSignatureRegex = createRegexFromInput(nonGenericSignature);
+	    var genericSignatureRegex = createRegexFromInput(genericSignature);
+	} catch(e) {
+	    console.log(e);
+	    switch(e.name) {
+		case 'SyntaxError':
+		case 'EmptyQueryError':
+		case 'ParseError':
+		    return resolve('');
+		default:
+		    return reject(e);
+	   }
+	}
+	try {
+	    dbConnect(function(err, db){
+		if(err) { throw err; }
+		var signatures = db.collection('signatures');
+		var qw = {"$or": [
+		    {"genericSignature": {"$regex": genericSignatureRegex}},
+		    {"genericSignature": {"$regex": nonGenericSignatureRegex}}
+		]};
+		signatures.find(qw).toArray(function(err, results) {
+		    if(err) { throw err; }
+		    db.close();
+		    var r = [];
+		    if(results) {
+			r = selectValidResults(parsedInput, results);
+		    }
+		    return resolve(r);
+		});
+	    });
+	} catch(e) {
+	    return reject(e);
+	}
     });
 };
 
