@@ -43,7 +43,7 @@ var makeGenericSignature = function(sig) {
 var createRegexFromInput = function(input) {
     var regex = input.replace(/\*/, ".*");
     var escaped = regex.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
-    return escaped;
+    return "^"+escaped+"$";
 };
 
 var selectValidResults = function(inputSignature, results) {
