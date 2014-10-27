@@ -2,14 +2,15 @@ var peg = require('pegjs');
 var ser = require('./serializer');
 var fs = require('fs');
 
-module.exports  = function(req, parserCodePath){
-		var result;
-		try{
-		var parserCode = fs.readFileSync(parserCodePath, "utf-8");
-		var parser = peg.buildParser(parserCode);
-		result = ser.deserialize(parser.parse(req));
-		} catch(err) {
-		console.log("ERROR!");
-		}
+var pegParser;
+
+module.exports.loadParser = function(path) {
+		pegParser = peg.buildParser(fs.readFileSync(path, "utf-8"));
+};
+
+module.exports.parseString = function(str) {
+		if(!str) throw {name: 'EmptyQueryError'};
+		var result = ser.deserialize(pegParser.parse(str));
+		if(!result)	throw {name: 'ParseError'};
 		return result;
-	};
+};

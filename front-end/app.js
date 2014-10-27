@@ -5,12 +5,14 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var Promise = require('bluebird');
-var parser = require('../engine/lib/parser');
 var infer = require('../engine/lib/infer');
 var constraintSolver = require('../engine/lib/constraintSolver');
 var types = require('../engine/lib/types');
 
 var MongoClient = require('mongodb').MongoClient;
+
+var parser = require('../engine/lib/parser.js');
+parser.loadParser('../engine/lib/parser.pegjs');
 
 var app = express();
 
@@ -29,9 +31,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 var dbConnect = MongoClient.connect.bind(MongoClient, 'mongodb://127.0.0.1:27017/joogle');
 
-var parseInput = function(query) {
-    return parser(query, '../engine/lib/parser.pegjs');
-};
 
 var makeNonGenericSignature = function(sig) {
     return infer.renameGenericTypes(sig, new infer.normalizerScope());
@@ -78,28 +77,41 @@ var getDetails = function(fnName) {
 
 var getResults = function(query) {
     return new Promise(function(resolve, reject) {
-	try {
-	    dbConnect(function(err, db){
-		if(err) { throw err; }
-		var parsedInput = parseInput(query);
-		var nonGenericSignature = types.typeToString(makeNonGenericSignature(parsedInput));
-		var genericSignature = types.typeToString(makeGenericSignature(parsedInput));
-		var signatures = db.collection('signatures');
-		signatures.find({"genericSignature": { $in: [genericSignature, nonGenericSignature]}}).toArray(function(err, results) {
-		    if(err) { throw err; }
-		    db.close();
-		    console.log(results);
-		    var r = [];
-		    if(results) {
-			r = selectValidResults(parsedInput, results);
-		    }
-		    console.log(r);
-		    resolve(r);
-		});
-	    });
-	} catch(e) {
-	    reject(e);
-	}
+		try {
+			var parsedInput = parser.parseString(query);
+		    dbConnect(function(err, db){
+				if(err) { throw err; }
+				var nonGenericSignature = types.typeToString(makeNonGenericSignature(parsedInput));
+				var genericSignature = types.typeToString(makeGenericSignature(parsedInput));
+				var signatures = db.collection('signatures');
+				
+				signatures.find({"genericSignature": { $in: [genericSignature, nonGenericSignature]}}).toArray(function(err, results) {
+				    if(err) { throw err; }
+				    db.close();
+				    console.log(results);
+				    var r = [];
+				    if(results) {
+						r = selectValidResults(parsedInput, results);
+				    }
+				    console.log(r);
+					resolve(r);
+					});
+		    });
+		} catch(e) {
+			console.log(e);
+			switch(e.name) {
+				case 'SyntaxError':
+					resolve('');
+					break;
+				case 'EmptyQueryError':
+					resolve('');
+					break;
+				case 'ParseError':
+					resolve()					
+				default:
+					reject(e);
+			}
+		}
     });
 };
 
@@ -113,7 +125,7 @@ app.get('/search', function(req, res) {
         var results = obj;
         res.render('search', {"results": results, "title": query+" :: Search results :: "});
     }).catch(function(err) {
-	res.status(500).send("DB error: "+err);
+	res.status(500).send("Query handling error: "+err);
     });
 });
 
@@ -122,7 +134,7 @@ app.get('/details/:name', function(req, res) {
     getDetails(name).then(function(obj) {
         res.render('details', {"results": obj, "title": name+" :: "});
     }).catch(function(err) {
-	res.status(500).send("DB error: "+err);
+	res.status(500).send("Query handling error: "+err);
     });
 });
 
