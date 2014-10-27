@@ -10,7 +10,8 @@ typeList
  / "" {return []; }
  
 type
- = objectType
+ = anyType
+ / objectType
  / arrType
  / functionType
  / simpleType
@@ -18,31 +19,28 @@ type
 space 
  = " " *
 
+anyType
+ = "*" { return {'!kind': 'Any'}; }
+
 simpleType
   = name:simpleName {
-	  var type = 'Generic';
-	  switch(name){
-		  case 'Number': 
-			type = 'Simple';
+	  var type;
+		switch(name){
+		  case 'Number':
+		  case 'Boolean':
+		  case 'Array':
+		  case 'RegExp':
+		  case 'String':
+				type = 'Simple';
 			break;
-		  case 'Boolean': 
-			type = 'Simple';
-			break;
-		  case 'Array': 
-			type = 'Simple';
-			break;
-		  case 'RegExp': 
-			type = 'Simple';
-			break;
-		  case 'String': 
-			type = 'Simple';
-			break;
-		  }
+			default:
+				type = 'Generic';
+		}
 	  return {'!kind': type, name: name};
-	  }
+	}
 
 simpleName
-  = firstChar: [a-zA-z\*] rest: [a-zA-Z0-9]* {return firstChar + rest.join("");}
+  = firstChar: [a-zA-z] rest: [a-zA-Z0-9]* {return firstChar + rest.join("");}
 
 
 
