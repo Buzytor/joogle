@@ -42,7 +42,7 @@ simpleType
 	  }
 
 simpleName
-  = firstChar: [a-zA-z] rest: [a-zA-Z0-9]* {return firstChar + rest.join("");}
+  = firstChar: [a-zA-z\*] rest: [a-zA-Z0-9]* {return firstChar + rest.join("");}
 
 
 

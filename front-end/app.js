@@ -40,6 +40,12 @@ var makeGenericSignature = function(sig) {
     return infer.createGenericSignature(sig);
 };
 
+var createRegexFromInput = function(input) {
+    var regex = input.replace(/\*/, ".*");
+    var escaped = regex.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+    return escaped;
+};
+
 var selectValidResults = function(inputSignature, results) {
     var inputConstraint = infer.Constraint(new types.Generic('XXX'), inputSignature);
     return results.filter(function(func) {
@@ -75,24 +81,28 @@ var getDetails = function(fnName) {
     });
 };
 
-var getResults = function(query) {
+var getResults = function(rawInput) {
+    var parsedInput = parser.parseString(rawInput);
+    var nonGenericSignature = types.typeToString(makeNonGenericSignature(parsedInput));
+    var genericSignature = types.typeToString(makeGenericSignature(parsedInput));
+    var nonGenericSignatureRegex = createRegexFromInput(nonGenericSignature);
+    var genericSignatureRegex = createRegexFromInput(genericSignature);
     return new Promise(function(resolve, reject) {
         try {
-            var parsedInput = parser.parseString(query);
             dbConnect(function(err, db){
                 if(err) { throw err; }
-                var nonGenericSignature = types.typeToString(makeNonGenericSignature(parsedInput));
-                var genericSignature = types.typeToString(makeGenericSignature(parsedInput));
                 var signatures = db.collection('signatures');
-                signatures.find({"genericSignature": { $in: [genericSignature, nonGenericSignature]}}).toArray(function(err, results) {
+                var qw = {"$or": [
+                    {"genericSignature": {"$regex": genericSignatureRegex}},
+                    {"genericSignature": {"$regex": nonGenericSignatureRegex}}
+                ]};
+                signatures.find(qw).toArray(function(err, results) {
                     if(err) { throw err; }
                     db.close();
-                    console.log(results);
                     var r = [];
                     if(results) {
                         r = selectValidResults(parsedInput, results);
                     }
-                    console.log(r);
                     resolve(r);
                 });
             });
