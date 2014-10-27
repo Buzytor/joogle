@@ -107,7 +107,8 @@ var getResults = function(query) {
 					resolve('');
 					break;
 				case 'ParseError':
-					resolve()					
+					resolve('')
+					break;					
 				default:
 					reject(e);
 			}
