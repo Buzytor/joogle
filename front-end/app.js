@@ -77,42 +77,41 @@ var getDetails = function(fnName) {
 
 var getResults = function(query) {
     return new Promise(function(resolve, reject) {
-		try {
-			var parsedInput = parser.parseString(query);
-		    dbConnect(function(err, db){
-				if(err) { throw err; }
-				var nonGenericSignature = types.typeToString(makeNonGenericSignature(parsedInput));
-				var genericSignature = types.typeToString(makeGenericSignature(parsedInput));
-				var signatures = db.collection('signatures');
-				
-				signatures.find({"genericSignature": { $in: [genericSignature, nonGenericSignature]}}).toArray(function(err, results) {
-				    if(err) { throw err; }
-				    db.close();
-				    console.log(results);
-				    var r = [];
-				    if(results) {
-						r = selectValidResults(parsedInput, results);
-				    }
-				    console.log(r);
-					resolve(r);
-					});
-		    });
-		} catch(e) {
-			console.log(e);
-			switch(e.name) {
-				case 'SyntaxError':
-					resolve('');
-					break;
-				case 'EmptyQueryError':
-					resolve('');
-					break;
-				case 'ParseError':
-					resolve('')
-					break;					
-				default:
-					reject(e);
-			}
-		}
+        try {
+            var parsedInput = parser.parseString(query);
+            dbConnect(function(err, db){
+                if(err) { throw err; }
+                var nonGenericSignature = types.typeToString(makeNonGenericSignature(parsedInput));
+                var genericSignature = types.typeToString(makeGenericSignature(parsedInput));
+                var signatures = db.collection('signatures');
+                signatures.find({"genericSignature": { $in: [genericSignature, nonGenericSignature]}}).toArray(function(err, results) {
+                    if(err) { throw err; }
+                    db.close();
+                    console.log(results);
+                    var r = [];
+                    if(results) {
+                        r = selectValidResults(parsedInput, results);
+                    }
+                    console.log(r);
+                    resolve(r);
+                });
+            });
+        } catch(e) {
+            console.log(e);
+            switch(e.name) {
+                case 'SyntaxError':
+                    resolve('');
+                    break;
+                case 'EmptyQueryError':
+                    resolve('');
+                    break;
+                case 'ParseError':
+                    resolve('')
+                        break;
+                default:
+                    reject(e);
+           }
+        }
     });
 };
 
