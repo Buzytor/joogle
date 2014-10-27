@@ -15,6 +15,7 @@ type
  / arrType
  / functionType
  / simpleType
+ / "" { return ""; }
 
 space 
  = " " *

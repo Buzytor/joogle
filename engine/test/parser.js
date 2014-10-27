@@ -115,7 +115,7 @@ var testSuite = function() {
 		
 		test(
 			'(*) -> A',
-			{'!kind': 'Function', selfType: 'Any',
+			{'!kind': 'Function', selfType: { '!kind': 'Any'},
 			params: [ { '!kind': "Any" } ],
 			returnType: {'!kind': 'Generic', name: 'A'}}
 		);
