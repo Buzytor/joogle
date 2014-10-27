@@ -12,6 +12,9 @@ var serialize = exports.serialize = function(type) {
 };
 
 var deserialize = exports.deserialize = function(json) {
+	if(json['!kind'] === "Any") {
+		return json;
+	}
 	var proto = types.kindToPrototype[json['!kind']];
 	delete json['!kind'];
 	var tmp = Object.create(proto);
