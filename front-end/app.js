@@ -93,7 +93,7 @@ var getResults = function(rawInput) {
 	    console.log(e);
 	    switch(e.name) {
 		case 'Error':
-		case 'ParseError':
+		case 'SyntaxError':
 		    return resolve('');
 		default:
 		    return reject(e);
