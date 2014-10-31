@@ -3,7 +3,7 @@ block content
   include header
   #details
     #results
-      if results
+      if results && results.length > 0
         each result in results
           .result
             .declaration
