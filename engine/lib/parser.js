@@ -13,8 +13,8 @@ module.exports.parseNoDeserialize = function(str) {
 };
 
 module.exports.parseString = function(str) {
-	if(!str) throw {name: 'EmptyQueryError'};
+	if(!str) throw new Error('EmptyQueryError');
 	var result = ser.deserialize(pegParser.parse(str));
-	if(!result)	throw {name: 'ParseError'};
+	if(!result)	throw new Error('ParseError');
 	return result;
 };

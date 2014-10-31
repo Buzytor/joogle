@@ -92,8 +92,7 @@ var getResults = function(rawInput) {
 	} catch(e) {
 	    console.log(e);
 	    switch(e.name) {
-		case 'SyntaxError':
-		case 'EmptyQueryError':
+		case 'Error':
 		case 'ParseError':
 		    return resolve('');
 		default:
